@@ -50,7 +50,13 @@ function parseSearch(html) {
       source: 'wallhaven',
       title: `wallhaven-${id}`,
       thumb: `https://th.wallhaven.cc/small/${first}/${id}.jpg`,
-      full_url: `https://w.wallhaven.cc/full/${first}/wallhaven-${id}.jpg`,
+      // full_url always points through our /api/dl proxy so PNG/JPG auto-detection
+      // works (Wallhaven serves some images as PNG, some as JPG — the proxy tries
+      // all extensions with proper Referer). For direct CDN URL, see cdn_url field.
+      full_url: `https://zade-wallpaper-api.vercel.app/api/dl?source=wallhaven&id=${id}`,
+      // cdn_url is the raw Wallhaven CDN URL — guess .png first, user can swap to .jpg manually
+      cdn_url_png: `https://w.wallhaven.cc/full/${first}/wallhaven-${id}.png`,
+      cdn_url_jpg: `https://w.wallhaven.cc/full/${first}/wallhaven-${id}.jpg`,
       page_url: `https://wallhaven.cc/w/${id}`
     });
   }
@@ -119,6 +125,16 @@ module.exports = async function handler(req, res) {
     }
     const all = parseSearch(html);
     const results = all.slice(0, limit);
+    const format = url.searchParams.get('format');
+    if (format === 'urls') {
+      // Flat array of direct image URLs only (no metadata wrapper)
+      // Use /api/dl-style resolution via the .png default — most wallhaven images are PNG
+      const urls = results.map(r => r.full_url);
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      return res.end(JSON.stringify(urls));
+    }
     const payload = {
       ok: true,
       owner: '@zade4everbot',
