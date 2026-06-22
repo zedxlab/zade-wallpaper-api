@@ -1,4 +1,3 @@
-// Vercel rewrites: every URL maps to api/<name>.js
 {
   "rewrites": [
     { "source": "/", "destination": "/api/index" },
