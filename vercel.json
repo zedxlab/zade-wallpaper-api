@@ -1,0 +1,11 @@
+// Vercel rewrites: every URL maps to api/<name>.js
+{
+  "rewrites": [
+    { "source": "/", "destination": "/api/index" },
+    { "source": "/api", "destination": "/api/index" },
+    { "source": "/api/wallhaven", "destination": "/api/wallhaven" },
+    { "source": "/api/wallpaperaccess", "destination": "/api/wallpaperaccess" },
+    { "source": "/api/workshop", "destination": "/api/workshop" },
+    { "source": "/api/dl", "destination": "/api/dl" }
+  ]
+}

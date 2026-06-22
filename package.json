@@ -1,0 +1,13 @@
+{
+  "name": "zade-wallpaper-api",
+  "version": "1.0.0",
+  "description": "Unified image/wallpaper API — Wallhaven, WallpaperFlare, WallpaperAccess, Wallpaper Engine (Steam Workshop)",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js",
+    "test": "node tests/local.js"
+  },
+  "dependencies": {
+    "undici": "^6.21.0"
+  }
+}
