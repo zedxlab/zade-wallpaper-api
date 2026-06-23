@@ -5,846 +5,817 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>zade-wallpaper-api — Wallpapers, simplified</title>
   <meta name="description" content="Unified wallpaper API across Wallhaven, Steam Workshop, and WallpaperAccess. Free, fast, JSON-first." />
-  <meta name="theme-color" content="#0a0a0a" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    /* ==========================================================
-       TECH INNOVATION — zora-design-skills/02-theme-factory
-       Background: #0a0a0a | Surface: #141414 | Accent: #00ff88
-       Text Primary: #ffffff | Text Secondary: #00cc66
-       Heading: Space Grotesk | Body: JetBrains Mono
-       ========================================================== */
     :root {
-      --bg: #0a0a0a;
-      --surface: #141414;
-      --surface-hover: #1a1a1a;
-      --surface-border: #222222;
-      --accent: #00ff88;
-      --accent-dim: rgba(0, 255, 136, 0.12);
-      --accent-border: rgba(0, 255, 136, 0.25);
-      --text: #ffffff;
-      --text-secondary: #00cc66;
-      --text-muted: #888888;
-      --text-dim: #555555;
-      --font-heading: 'Space Grotesk', system-ui, sans-serif;
-      --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 16px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
-      --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
-      --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
-      --shadow-glow: 0 0 24px rgba(0,255,136,0.08);
-      --transition: 200ms cubic-bezier(0.4,0,0.2,1);
+      /* Core palette — orange to purple */
+      --bg:          #0b0b0f;
+      --bg-1:        #10101a;
+      --bg-2:        #15151f;
+      --bg-3:        #1c1c28;
+      --border:      rgba(255,255,255,0.07);
+      --border-hi:   rgba(255,255,255,0.13);
+
+      --text:        #f0eef8;
+      --text-dim:    #8b8a9e;
+      --text-faint:  #4a4960;
+
+      /* Accent system: orange → violet → purple */
+      --orange:      #ea5810;
+      --orange-dim:  #c24610;
+      --amber:       #f97316;
+      --violet:      #8b5cf6;
+      --violet-dim:  #6d3fd4;
+      --purple:      #a855f7;
+
+      /* Gradient: orange to purple */
+      --grad:        linear-gradient(135deg, #ea5810 0%, #c026d3 60%, #7c3aed 100%);
+      --grad-r:      linear-gradient(135deg, #7c3aed 0%, #c026d3 40%, #ea5810 100%);
+      --grad-soft:   linear-gradient(135deg, rgba(234,88,16,0.12) 0%, rgba(192,38,211,0.10) 60%, rgba(124,58,237,0.10) 100%);
+      --grad-text:   linear-gradient(90deg, #ea5810 0%, #e879f9 50%, #8b5cf6 100%);
+
+      --radius-sm:   6px;
+      --radius:      12px;
+      --radius-lg:   18px;
+      --radius-xl:   24px;
+
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      --glow-o:  0 0 40px rgba(234, 88, 16, 0.3);
+      --glow-v:  0 0 40px rgba(139, 92, 246, 0.3);
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      outline: none !important;
-    }
-
-    *:focus, *:focus-visible, *:focus-within {
-      outline: none !important;
-      box-shadow: 0 0 0 2px rgba(0,255,136,0.4) !important;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: var(--font-mono);
-      font-size: 14px;
-      line-height: 1.7;
+      font-family: var(--sans);
       background: var(--bg);
       color: var(--text);
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
+      min-height: 100vh;
     }
 
-    ::selection {
-      background: var(--accent-dim);
-      color: var(--accent);
+    /* ─── BACKGROUND ─── */
+    .bg-orbs {
+      position: fixed; inset: 0; z-index: -2; pointer-events: none;
     }
-
-    a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* ==========================================================
-       TOPBAR
-       ========================================================== */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(10, 10, 10, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--surface-border);
-    }
-
-    .topbar-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 56px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--font-heading);
-      font-weight: 600;
-      font-size: 16px;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 12px var(--accent);
-      animation: pulse-dot 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; box-shadow: 0 0 12px var(--accent); }
-      50% { opacity: 0.6; box-shadow: 0 0 20px var(--accent); }
-    }
-
-    .topbar-nav {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
-
-    .topbar-link {
-      font-size: 13px;
-      color: var(--text-muted);
-      transition: color var(--transition);
-    }
-
-    .topbar-link:hover { color: var(--accent); }
-
-    .btn-accent {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 32px;
-      padding: 0 14px;
-      border-radius: var(--radius-sm);
-      background: var(--accent);
-      color: #0a0a0a;
-      font-family: var(--font-heading);
-      font-size: 13px;
-      font-weight: 600;
-      transition: all var(--transition);
-    }
-
-    .btn-accent:hover {
-      box-shadow: var(--shadow-glow);
-      transform: translateY(-1px);
-    }
-
-    .btn-outline {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 32px;
-      padding: 0 14px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--surface-border);
-      background: transparent;
-      color: var(--text-muted);
-      font-family: var(--font-heading);
-      font-size: 13px;
-      font-weight: 500;
-      transition: all var(--transition);
-    }
-
-    .btn-outline:hover {
-      border-color: var(--accent-border);
-      color: var(--accent);
-      background: var(--accent-dim);
-    }
-
-    /* ==========================================================
-       HERO — left-aligned, not centered
-       ========================================================== */
-    .hero {
-      padding: 80px 0 64px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
-      align-items: center;
-    }
-
-    .hero-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 20px;
-      font-weight: 500;
-    }
-
-    .hero-tag::before {
-      content: "//";
-      color: var(--text-dim);
-    }
-
-    .hero h1 {
-      font-family: var(--font-heading);
-      font-size: 48px;
-      line-height: 1.05;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      margin-bottom: 20px;
-    }
-
-    .hero h1 .hl {
-      color: var(--accent);
-    }
-
-    .hero-desc {
-      font-size: 15px;
-      color: var(--text-muted);
-      line-height: 1.8;
-      max-width: 440px;
-      margin-bottom: 32px;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .hero-code {
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      overflow-x: auto;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 1.8;
-      color: var(--text-muted);
-      position: relative;
-    }
-
-    .hero-code .line-num {
-      color: var(--text-dim);
-      user-select: none;
-      display: inline-block;
-      width: 24px;
-      text-align: right;
-      margin-right: 16px;
-    }
-
-    .hero-code .kw { color: var(--accent); }
-    .hero-code .str { color: #ffd580; }
-    .hero-code .cmt { color: var(--text-dim); font-style: italic; }
-    .hero-code .fn { color: #82aaff; }
-    .hero-code .num { color: #f78c6c; }
-
-    .hero-code .copy-btn {
+    .bg-orbs::before {
+      content: '';
       position: absolute;
-      top: 12px;
-      right: 12px;
-      height: 24px;
-      padding: 0 8px;
-      font-size: 11px;
-      background: var(--surface-hover);
-      border: 1px solid var(--surface-border);
-      border-radius: 4px;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all var(--transition);
-      font-family: var(--font-mono);
+      width: 800px; height: 800px;
+      top: -200px; left: -200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(234,88,16,0.14) 0%, transparent 70%);
+      animation: orbDrift 18s ease-in-out infinite alternate;
+    }
+    .bg-orbs::after {
+      content: '';
+      position: absolute;
+      width: 700px; height: 700px;
+      bottom: -100px; right: -100px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,92,246,0.16) 0%, transparent 70%);
+      animation: orbDrift2 22s ease-in-out infinite alternate;
+    }
+    @keyframes orbDrift  { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(60px,40px) scale(1.08);} }
+    @keyframes orbDrift2 { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(-50px,-30px) scale(1.1);} }
+
+    .bg-grid {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse 90% 60% at 50% 20%, black 20%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 20%, black 20%, transparent 80%);
     }
 
-    .hero-code .copy-btn:hover {
-      border-color: var(--accent-border);
-      color: var(--accent);
+    /* ─── NAV ─── */
+    nav.topbar {
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      background: rgba(11,11,15,0.75);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 24px;
+      height: 58px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .logo {
+      font-family: var(--sans); font-weight: 700; font-size: 16px;
+      letter-spacing: -0.03em;
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--text);
+    }
+    .logo-mark {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--grad);
+      display: grid; place-items: center;
+      box-shadow: 0 0 20px rgba(234,88,16,0.45);
+      font-size: 14px; flex-shrink: 0;
+    }
+    .logo-mark i { color: #fff; }
+    .logo-name { background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    .nav-links { display: flex; gap: 6px; align-items: center; }
+    .nav-links a {
+      color: var(--text-dim); text-decoration: none;
+      font-size: 13.5px; font-weight: 500;
+      padding: 6px 12px; border-radius: var(--radius-sm);
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--bg-2); }
+    .nav-cta {
+      padding: 7px 14px !important;
+      background: rgba(234,88,16,0.12) !important;
+      border: 1px solid rgba(234,88,16,0.3) !important;
+      color: #f97316 !important;
+      font-weight: 600 !important;
+    }
+    .nav-cta:hover { background: rgba(234,88,16,0.22) !important; border-color: rgba(234,88,16,0.5) !important; }
+    @media (max-width: 640px) { .nav-links a:not(.nav-cta) { display: none; } }
+
+    /* ─── HERO ─── */
+    .hero {
+      max-width: 1200px; margin: 0 auto;
+      padding: 96px 24px 60px;
+      text-align: center; position: relative;
     }
 
-    /* ==========================================================
-       LIVE MOSAIC — signature element
-       ========================================================== */
-    .mosaic-section {
-      padding: 48px 0;
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 14px;
+      background: var(--bg-2);
+      border: 1px solid var(--border-hi);
+      border-radius: 100px;
+      font-size: 12.5px; color: var(--text-dim);
+      margin-bottom: 32px;
+      font-family: var(--mono);
+    }
+    .badge .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #22c55e; box-shadow: 0 0 10px #22c55e;
+      animation: blink 2.4s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+    h1 {
+      font-family: var(--sans);
+      font-size: clamp(42px, 7.5vw, 84px);
+      line-height: 1.03; letter-spacing: -0.045em; font-weight: 800;
+      margin-bottom: 22px;
+    }
+    .gradient-text {
+      background: var(--grad-text);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      background-size: 200% 200%;
+      animation: gradShift 6s ease infinite;
+    }
+    @keyframes gradShift { 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
+
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 18px);
+      color: var(--text-dim); max-width: 580px;
+      margin: 0 auto 36px; line-height: 1.65;
+    }
+    .hero-sub strong { color: var(--text); font-weight: 600; }
+
+    .hero-cta {
+      display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 60px;
     }
 
-    .mosaic-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 20px;
+    .btn {
+      padding: 12px 22px; border-radius: var(--radius);
+      font-size: 14px; font-weight: 600;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+      transition: all 0.2s; cursor: pointer; border: none;
+      font-family: var(--sans); letter-spacing: -0.01em;
     }
-
-    .mosaic-head h2 {
-      font-family: var(--font-heading);
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
+    .btn-primary {
+      background: var(--grad);
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(234,88,16,0.35);
     }
-
-    .mosaic-head .count {
-      font-size: 12px;
-      color: var(--text-dim);
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(234,88,16,0.5), 0 4px 12px rgba(139,92,246,0.3);
     }
-
-    .mosaic {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      grid-auto-rows: 120px;
-      gap: 8px;
+    .btn-ghost {
+      background: var(--bg-2); color: var(--text);
+      border: 1px solid var(--border-hi);
     }
+    .btn-ghost:hover { background: var(--bg-3); border-color: rgba(139,92,246,0.4); }
 
-    .mosaic-item {
-      position: relative;
-      overflow: hidden;
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-      cursor: pointer;
-      transition: transform var(--transition);
-    }
-
-    .mosaic-item:hover { transform: scale(1.03); z-index: 1; }
-
-    .mosaic-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 400ms cubic-bezier(0.2,0,0,1);
-    }
-
-    .mosaic-item:hover img { transform: scale(1.1); }
-
-    .mosaic-item.span-2 { grid-column: span 2; }
-    .mosaic-item.span-row { grid-row: span 2; }
-
-    .mosaic-loader {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-dim);
-      font-size: 12px;
-    }
-
-    /* ==========================================================
-       ENDPOINTS — asymmetric bento, not uniform cards
-       ========================================================== */
-    .endpoints {
-      padding: 64px 0;
-    }
-
-    .endpoints-head {
-      margin-bottom: 40px;
-    }
-
-    .endpoints-head .tag {
-      font-size: 11px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-weight: 500;
-      margin-bottom: 12px;
-    }
-
-    .endpoints-head h2 {
-      font-family: var(--font-heading);
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      max-width: 500px;
-    }
-
-    .ep-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .ep-card {
+    /* ─── LIVE GALLERY ─── */
+    .preview-wrap {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
       padding: 24px;
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-md);
-      background: var(--surface);
-      transition: all var(--transition);
-      display: flex;
-      flex-direction: column;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 24px 60px rgba(0,0,0,0.5);
     }
-
-    .ep-card:hover {
-      border-color: var(--accent-border);
-      box-shadow: var(--shadow-glow);
+    .preview-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px; flex-wrap: wrap; gap: 12px;
     }
-
-    .ep-card.highlight {
-      grid-column: 1 / -1;
-      background: linear-gradient(135deg, var(--surface) 0%, rgba(0,255,136,0.03) 100%);
-      border-color: var(--accent-border);
+    .preview-label {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-dim);
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--mono);
     }
-
-    .ep-route {
-      font-family: var(--font-mono);
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--accent);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #22c55e; box-shadow: 0 0 10px #22c55e;
+      animation: blink 2.4s ease-in-out infinite;
     }
-
-    .ep-method {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      background: var(--accent-dim);
-      color: var(--accent);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .search-row { display: flex; gap: 8px; align-items: center; }
+    .search-row input {
+      background: var(--bg-2); border: 1px solid var(--border-hi);
+      color: var(--text); padding: 8px 12px; border-radius: var(--radius-sm);
+      font-family: var(--mono); font-size: 12.5px; width: 200px; outline: none;
+      transition: border 0.2s;
     }
-
-    .ep-desc {
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.7;
-      margin-bottom: 16px;
+    .search-row input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(234,88,16,0.12); }
+    .search-row input::placeholder { color: var(--text-faint); }
+    .search-row button {
+      background: rgba(234,88,16,0.12); border: 1px solid rgba(234,88,16,0.3);
+      color: #f97316; padding: 8px 14px; border-radius: var(--radius-sm);
+      cursor: pointer; font-family: var(--sans); font-size: 13px; font-weight: 600;
+      transition: all 0.2s;
     }
+    .search-row button:hover { background: rgba(234,88,16,0.22); border-color: rgba(234,88,16,0.5); }
 
-    .ep-params {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: auto;
-    }
-
-    .param {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 3px;
-      background: var(--bg);
-      border: 1px solid var(--surface-border);
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-    }
-
-    .param b {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    /* ==========================================================
-       PLAYGROUND — interactive
-       ========================================================== */
-    .playground {
-      padding: 64px 0;
-    }
-
-    .playground-box {
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-
-    .playground-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--surface-border);
-    }
-
-    .playground-bar .method {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent);
-      text-transform: uppercase;
-    }
-
-    .playground-bar input {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--surface-border);
-      border-radius: 4px;
-      padding: 6px 10px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text);
-    }
-
-    .playground-bar input:focus {
-      border-color: var(--accent-border);
-      box-shadow: 0 0 0 1px var(--accent-dim) !important;
-    }
-
-    .playground-bar .go-btn {
-      height: 30px;
-      padding: 0 12px;
-      background: var(--accent);
-      color: #0a0a0a;
-      border: none;
-      border-radius: 4px;
-      font-family: var(--font-heading);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-
-    .playground-bar .go-btn:hover {
-      box-shadow: var(--shadow-glow);
-    }
-
-    .playground-result {
-      padding: 16px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      line-height: 1.8;
-      color: var(--text-muted);
-      max-height: 400px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .playground-result .json-key { color: #82aaff; }
-    .playground-result .json-str { color: #c3e88d; }
-    .playground-result .json-num { color: #f78c6c; }
-    .playground-result .json-bool { color: #c792ea; }
-
-    /* ==========================================================
-       USAGE EXAMPLES — side by side
-       ========================================================== */
-    .examples {
-      padding: 64px 0;
-    }
-
-    .examples-grid {
+    .gallery {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .gallery-item {
+      aspect-ratio: 16/10; border-radius: var(--radius);
+      overflow: hidden; position: relative;
+      background: var(--bg-3); cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s;
+      border: 1px solid var(--border);
+    }
+    .gallery-item:hover { transform: scale(1.04); z-index: 2; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .gallery-item .overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 55%);
+      opacity: 0; transition: opacity 0.3s;
+      display: flex; align-items: flex-end; padding: 10px;
+      font-size: 10.5px; font-family: var(--mono); color: var(--text);
+    }
+    .gallery-item:hover .overlay { opacity: 1; }
+    .gallery-skeleton {
+      aspect-ratio: 16/10; border-radius: var(--radius);
+      background: linear-gradient(90deg, var(--bg-1) 0%, var(--bg-3) 50%, var(--bg-1) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite; border: 1px solid var(--border);
+    }
+    @keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
+    /* ─── STATS STRIP ─── */
+    .stats-strip {
+      max-width: 1200px; margin: 0 auto 80px; padding: 0 24px;
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;
+    }
+    @media (max-width: 640px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+    .stat {
+      background: var(--bg-1); padding: 28px 24px;
+      transition: background 0.2s;
+    }
+    .stat:hover { background: var(--bg-2); }
+    .stat-val {
+      font-family: var(--sans); font-size: 38px; font-weight: 800; line-height: 1;
+      margin-bottom: 6px;
+      background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent;
+      letter-spacing: -0.04em;
+    }
+    .stat-label { font-size: 13px; color: var(--text-dim); font-weight: 500; }
+
+    /* ─── SECTIONS ─── */
+    section {
+      max-width: 1200px; margin: 0 auto 100px; padding: 0 24px;
+    }
+    .section-head { margin-bottom: 48px; }
+    .kicker {
+      font-family: var(--mono); font-size: 11.5px;
+      color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .kicker::before {
+      content: ''; width: 20px; height: 1px; background: var(--orange); opacity: 0.6;
+    }
+    .section-head h2 {
+      font-family: var(--sans);
+      font-size: clamp(26px, 4vw, 40px); letter-spacing: -0.035em;
+      font-weight: 800; margin-bottom: 12px; line-height: 1.1;
+    }
+    .section-head p { color: var(--text-dim); font-size: 16px; max-width: 560px; }
+    .section-head code {
+      font-family: var(--mono); background: var(--bg-2);
+      border: 1px solid var(--border-hi); padding: 1px 7px;
+      border-radius: 5px; font-size: 13px; color: var(--violet);
     }
 
-    .example-block {
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-
-    .example-tab {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--surface-border);
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .example-tab .lang {
-      color: var(--accent);
-      font-family: var(--font-heading);
-      font-weight: 600;
-    }
-
-    .example-code {
-      padding: 16px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      line-height: 1.8;
-      color: var(--text-muted);
-      overflow-x: auto;
-    }
-
-    /* ==========================================================
-       FOOTER
-       ========================================================== */
-    footer {
-      padding: 48px 0 32px;
-      border-top: 1px solid var(--surface-border);
-      margin-top: 48px;
-    }
-
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
+    /* ─── ENDPOINT CARDS ─── */
+    .endpoints {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 16px;
     }
+    .ep-card {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+      position: relative; overflow: hidden;
+    }
+    .ep-card::after {
+      content: ''; position: absolute;
+      inset: 0; border-radius: var(--radius-lg);
+      background: var(--grad-soft); opacity: 0;
+      transition: opacity 0.3s; pointer-events: none;
+    }
+    .ep-card:hover {
+      border-color: var(--border-hi);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .ep-card:hover::after { opacity: 1; }
+    .ep-card > * { position: relative; z-index: 1; }
 
-    .footer-left {
-      font-size: 12px;
-      color: var(--text-dim);
+    .ep-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+    }
+    .ep-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--grad-soft); border: 1px solid var(--border-hi);
+      display: grid; place-items: center; font-size: 17px;
+    }
+    .ep-icon i { background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .ep-method {
+      font-family: var(--mono); font-size: 11px;
+      padding: 3px 9px; border-radius: 5px;
+      background: rgba(34,197,94,0.12); color: #4ade80;
+      border: 1px solid rgba(34,197,94,0.25); font-weight: 600;
+    }
+    .ep-path {
+      font-family: var(--mono); font-size: 17px; font-weight: 700;
+      color: var(--text); margin-bottom: 8px; letter-spacing: -0.02em;
+    }
+    .ep-desc { color: var(--text-dim); font-size: 13.5px; margin-bottom: 16px; line-height: 1.55; }
+    .ep-params { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .param {
+      font-family: var(--mono); font-size: 11px;
+      padding: 3px 9px; background: var(--bg-2);
+      border: 1px solid var(--border); border-radius: 5px; color: var(--text-dim);
+    }
+    .param strong { color: var(--violet); font-weight: 600; }
+
+    .ep-example {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 12px;
+      font-family: var(--mono); font-size: 11.5px;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      word-break: break-all;
+    }
+    .ep-example code { flex: 1; color: #f97316; }
+    .copy-btn {
+      background: var(--bg-2); border: 1px solid var(--border-hi);
+      color: var(--text-dim); padding: 5px 10px; border-radius: 5px;
+      cursor: pointer; font-size: 10.5px; font-family: var(--sans); font-weight: 600;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .copy-btn:hover { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .copy-btn.copied { background: #22c55e; color: #fff; border-color: #22c55e; }
+
+    /* ─── CODE BLOCKS ─── */
+    .code-block {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 22px;
+      font-family: var(--mono); font-size: 12.5px; line-height: 1.75;
+      overflow-x: auto; color: var(--text); position: relative;
+    }
+    .tok-key  { color: #f472b6; }
+    .tok-str  { color: #86efac; }
+    .tok-num  { color: #fde047; }
+    .tok-bool { color: #c4b5fd; }
+    .tok-null { color: #94a3b8; }
+    .tok-cm   { color: var(--text-faint); font-style: italic; }
+    .tok-pun  { color: var(--text-dim); }
+
+    .demo-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    @media (max-width: 768px) { .demo-row { grid-template-columns: 1fr; } }
+    .demo-col h3 {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--orange); text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 10px;
     }
 
-    .footer-left a {
-      color: var(--accent);
+    /* ─── FEATURES GRID ─── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;
+    }
+    .feat-card {
+      background: var(--bg-1); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 24px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .feat-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
+    .feat-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--grad-soft); border: 1px solid var(--border-hi);
+      display: grid; place-items: center; font-size: 16px;
+      margin-bottom: 14px;
+    }
+    .feat-icon i { background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .feat-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.02em; }
+    .feat-card p  { font-size: 13.5px; color: var(--text-dim); line-height: 1.55; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 52px 24px 36px;
+      background: rgba(0,0,0,0.2);
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+    }
+    @media (max-width: 768px) { .footer-inner { grid-template-columns: 1fr; } }
+    .footer-brand p {
+      color: var(--text-dim); font-size: 13.5px;
+      margin-top: 10px; max-width: 300px; line-height: 1.6;
+    }
+    .footer-col h4 {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--text-faint); text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: 16px;
+    }
+    .footer-col a {
+      display: block; color: var(--text-dim);
+      text-decoration: none; font-size: 13.5px;
+      padding: 4px 0; transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--orange); }
+    .footer-bottom {
+      max-width: 1200px; margin: 36px auto 0;
+      padding-top: 24px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      font-size: 12.5px; color: var(--text-faint); font-family: var(--mono);
     }
 
-    .footer-links {
-      display: flex;
-      gap: 20px;
+    /* ─── DIVIDER ─── */
+    .grad-line {
+      height: 1px; width: 100%;
+      background: linear-gradient(90deg, transparent, rgba(234,88,16,0.4), rgba(139,92,246,0.4), transparent);
+      margin: 0 auto; max-width: 1200px;
     }
 
-    .footer-links a {
-      font-size: 12px;
-      color: var(--text-dim);
-      transition: color var(--transition);
+    /* ─── ANIM HELPERS ─── */
+    .fade-in     { opacity: 0; transform: translateY(28px); }
+    .stagger-card{ opacity: 0; transform: translateY(18px); }
+
+    @media (max-width: 640px) {
+      .hero { padding: 64px 20px 40px; }
+      section { margin-bottom: 64px; }
+      .ep-card { padding: 20px; }
+      .preview-wrap { padding: 18px; }
     }
 
-    .footer-links a:hover { color: var(--accent); }
-
-    /* ==========================================================
-       SCROLL REVEAL
-       ========================================================== */
-    .reveal {
-      opacity: 0;
-      transform: translateY(16px);
-      transition: opacity 600ms cubic-bezier(0.4,0,0.2,1), transform 600ms cubic-bezier(0.4,0,0.2,1);
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ==========================================================
-       RESPONSIVE
-       ========================================================== */
-    @media (max-width: 768px) {
-      .hero { grid-template-columns: 1fr; padding: 48px 0 32px; }
-      .hero h1 { font-size: 32px; }
-      .mosaic { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 90px; }
-      .ep-grid { grid-template-columns: 1fr; }
-      .ep-card.highlight { grid-column: auto; }
-      .examples-grid { grid-template-columns: 1fr; }
-      .topbar-nav .topbar-link { display: none; }
-    }
-
-    @media (max-width: 480px) {
-      .hero h1 { font-size: 28px; }
-      .mosaic { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 80px; gap: 4px; }
+    @media (prefers-reduced-motion: reduce) {
+      .bg-orbs::before, .bg-orbs::after,
+      .gradient-text, .badge .dot, .live-dot,
+      .gallery-skeleton { animation: none !important; }
     }
   </style>
 </head>
 <body>
+  <div class="bg-orbs"></div>
+  <div class="bg-grid"></div>
 
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <div class="container topbar-inner">
-      <a href="#" class="brand">
-        <span class="brand-dot"></span>
-        <span>zade-wallpaper-api</span>
+  <!-- NAV -->
+  <nav class="topbar">
+    <div class="nav-inner">
+      <a href="/" class="logo">
+        <div class="logo-mark"><i class="fa-solid fa-image"></i></div>
+        <span class="logo-name">zade-wallpaper-api</span>
       </a>
-      <nav class="topbar-nav">
-        <a href="#endpoints" class="topbar-link">Endpoints</a>
-        <a href="#playground" class="topbar-link">Playground</a>
-        <a href="#examples" class="topbar-link">Examples</a>
-        <a href="https://github.com/zedxlab/zade-wallpaper-api" target="_blank" rel="noopener" class="topbar-link">GitHub</a>
-        <a href="#playground" class="btn-accent">Try it now</a>
-      </nav>
+      <div class="nav-links">
+        <a href="#endpoints">Endpoints</a>
+        <a href="#examples">Examples</a>
+        <a href="https://github.com/zedxlab/zade-wallpaper-api" target="_blank" rel="noopener">
+          <i class="fa-brands fa-github"></i> GitHub
+        </a>
+        <a href="/api" class="nav-cta">
+          <i class="fa-solid fa-bolt"></i> Live JSON
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="badge fade-in">
+      <span class="dot"></span>
+      Live on Vercel · Owner @zade4everbot
+    </div>
+    <h1 class="fade-in">
+      Wallpapers,<br><span class="gradient-text">simplified.</span>
+    </h1>
+    <p class="hero-sub fade-in">
+      One unified API across <strong>Wallhaven</strong>, <strong>Steam Workshop</strong>, and <strong>WallpaperAccess</strong>. Search, fetch, download — JSON in, image out. No keys, no auth, no nonsense.
+    </p>
+    <div class="hero-cta fade-in">
+      <a href="#endpoints" class="btn btn-primary">
+        <i class="fa-solid fa-rocket"></i> Explore endpoints
+      </a>
+      <a href="https://zade-wallpaper-api.vercel.app/api/wallhaven?q=anime&limit=3" target="_blank" rel="noopener" class="btn btn-ghost">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Try live query
+      </a>
+    </div>
+
+    <!-- LIVE GALLERY -->
+    <div class="preview-wrap fade-in">
+      <div class="preview-bar">
+        <div class="preview-label">
+          <span class="live-dot"></span> live_preview.json
+        </div>
+        <div class="search-row">
+          <input id="searchQ" type="text" placeholder="anime sunset..." value="anime sunset" />
+          <button id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        </div>
+      </div>
+      <div id="gallery" class="gallery"></div>
     </div>
   </header>
 
-  <!-- HERO — left-aligned, code on right, no purple gradient -->
-  <section class="hero">
-    <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
-      <div>
-        <div class="hero-tag">v1.0 · free · no auth</div>
-        <h1>Wallpapers.<br><span class="hl">One endpoint.</span></h1>
-        <p class="hero-desc">
-          Clean JSON from Wallhaven, Steam Workshop, and WallpaperAccess.
-          No API keys. No rate limits. No nonsense.
-        </p>
-        <div class="hero-actions">
-          <a href="#playground" class="btn-accent">
-            Try it live
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-          <a href="#endpoints" class="btn-outline">View endpoints</a>
-        </div>
+  <!-- STATS STRIP -->
+  <div class="stats-strip">
+    <div class="stats-grid">
+      <div class="stat stagger-card">
+        <div class="stat-val" data-target="4">0</div>
+        <div class="stat-label">Live endpoints</div>
       </div>
-      <div class="hero-code">
-        <button class="copy-btn" onclick="copyCode(this, document.getElementById('hero-pre'))">Copy</button>
-        <pre id="hero-pre"><span class="line-num">1</span><span class="cmt">// one request, six sources</span>
-<span class="line-num">2</span><span class="kw">GET</span> /api/wallhaven?q=mountains&limit=6
-<span class="line-num">3</span>
-<span class="line-num">4</span><span class="cmt">// response</span>
-<span class="line-num">5</span>{
-<span class="line-num">6</span>  <span class="str">"source"</span>: <span class="str">"wallhaven"</span>,
-<span class="line-num">7</span>  <span class="str">"total"</span>: <span class="num">6</span>,
-<span class="line-num">8</span>  <span class="str">"results"</span>: [
-<span class="line-num">9</span>    { <span class="str">"url"</span>: <span class="str">"cdn.wallhaven.cc/full/..."</span> }
-<span class="line-num">10</span>  ]
-<span class="line-num">11</span>}</pre>
+      <div class="stat stagger-card">
+        <div class="stat-val" data-target="3">0</div>
+        <div class="stat-label">Wallpaper sources</div>
+      </div>
+      <div class="stat stagger-card">
+        <div class="stat-val" data-target="100" data-suffix="%">0</div>
+        <div class="stat-label">Free · No auth needed</div>
+      </div>
+      <div class="stat stagger-card">
+        <div class="stat-val"><i class="fa-solid fa-infinity"></i></div>
+        <div class="stat-label">Scale on Vercel edge</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grad-line"></div>
+
+  <!-- FEATURES -->
+  <section style="margin-top: 80px;">
+    <div class="section-head fade-in">
+      <div class="kicker">why use this</div>
+      <h2>Built for developers, not browsers.</h2>
+      <p>Drop-in JSON API that abstracts scraping complexity — so you can build bots, apps, and automation without touching a single HTML parser.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card fade-in">
+        <div class="feat-icon"><i class="fa-solid fa-bolt"></i></div>
+        <h3>Zero auth</h3>
+        <p>No API keys, no registration, no rate-limit headers. Just HTTP GET.</p>
+      </div>
+      <div class="feat-card fade-in">
+        <div class="feat-icon"><i class="fa-solid fa-code"></i></div>
+        <h3>JSON-first</h3>
+        <p>Every response is a clean JSON contract with deduped results, totals, and a <code style="font-family:var(--mono);font-size:11px;color:var(--violet)">cached</code> flag.</p>
+      </div>
+      <div class="feat-card fade-in">
+        <div class="feat-icon"><i class="fa-solid fa-download"></i></div>
+        <h3>Proxy download</h3>
+        <p>Unified <code style="font-family:var(--mono);font-size:11px;color:var(--violet)">/api/dl</code> endpoint auto-detects PNG/JPG/WebP and handles Referer headers.</p>
+      </div>
+      <div class="feat-card fade-in">
+        <div class="feat-icon"><i class="fa-solid fa-layer-group"></i></div>
+        <h3>3 sources, 1 API</h3>
+        <p>Wallhaven, Steam Workshop, and WallpaperAccess unified behind one predictable interface.</p>
       </div>
     </div>
   </section>
 
-  <!-- LIVE MOSAIC — signature element -->
-  <section class="mosaic-section reveal">
-    <div class="container">
-      <div class="mosaic-head">
-        <h2>Live from Wallhaven</h2>
-        <span class="count" id="mosaic-count">loading…</span>
+  <!-- ENDPOINTS -->
+  <section id="endpoints">
+    <div class="section-head fade-in">
+      <div class="kicker">4 endpoints</div>
+      <h2>Everything you need, nothing you don't.</h2>
+      <p>Each endpoint is a clean JSON contract. Hit it with curl, fetch, axios — anything that speaks HTTP.</p>
+    </div>
+
+    <div class="endpoints">
+      <!-- /api/wallhaven -->
+      <div class="ep-card stagger-card">
+        <div class="ep-header">
+          <div class="ep-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <span class="ep-method">GET</span>
+        </div>
+        <div class="ep-path">/api/wallhaven</div>
+        <p class="ep-desc">Full-text search across wallhaven.cc — the largest free wallpaper archive. Returns thumbs + CDN URLs + proxy links.</p>
+        <div class="ep-params">
+          <span class="param"><strong>q</strong> search</span>
+          <span class="param"><strong>limit</strong> 1–64</span>
+          <span class="param"><strong>page</strong> 1..n</span>
+          <span class="param"><strong>purity</strong> 100</span>
+          <span class="param"><strong>sort</strong> relevance|date|views</span>
+          <span class="param"><strong>atleast</strong> 1920x1080</span>
+          <span class="param"><strong>format</strong> urls</span>
+        </div>
+        <div class="ep-example">
+          <code>/api/wallhaven?q=anime&limit=3&format=urls</code>
+          <button class="copy-btn" data-copy="/api/wallhaven?q=anime&limit=3&format=urls">Copy</button>
+        </div>
       </div>
-      <div class="mosaic" id="mosaic"></div>
+
+      <!-- /api/dl -->
+      <div class="ep-card stagger-card">
+        <div class="ep-header">
+          <div class="ep-icon"><i class="fa-solid fa-download"></i></div>
+          <span class="ep-method">GET</span>
+        </div>
+        <div class="ep-path">/api/dl</div>
+        <p class="ep-desc">Unified direct-download endpoint. Auto-detects PNG / JPG / WebP, sets correct Referer, streams the binary back.</p>
+        <div class="ep-params">
+          <span class="param"><strong>source</strong> wallhaven|wallpaperaccess</span>
+          <span class="param"><strong>id</strong> wallpaper id</span>
+          <span class="param"><strong>url</strong> passthrough</span>
+        </div>
+        <div class="ep-example">
+          <code>/api/dl?source=wallhaven&id=j37zv5</code>
+          <button class="copy-btn" data-copy="/api/dl?source=wallhaven&id=j37zv5">Copy</button>
+        </div>
+      </div>
+
+      <!-- /api/workshop -->
+      <div class="ep-card stagger-card">
+        <div class="ep-header">
+          <div class="ep-icon"><i class="fa-brands fa-steam"></i></div>
+          <span class="ep-method">GET</span>
+        </div>
+        <div class="ep-path">/api/workshop</div>
+        <p class="ep-desc">Browse Steam Workshop for Wallpaper Engine (appid 431960). Real titles, authors, preview URLs. Binary downloads redirect to source — Steam requires a subscription.</p>
+        <div class="ep-params">
+          <span class="param"><strong>q</strong> text filter</span>
+          <span class="param"><strong>sort</strong> trend|newest|rating|popular</span>
+          <span class="param"><strong>page</strong></span>
+          <span class="param"><strong>limit</strong></span>
+        </div>
+        <div class="ep-example">
+          <code>/api/workshop?sort=trend&limit=10</code>
+          <button class="copy-btn" data-copy="/api/workshop?sort=trend&limit=10">Copy</button>
+        </div>
+      </div>
+
+      <!-- /api/wallpaperaccess -->
+      <div class="ep-card stagger-card">
+        <div class="ep-header">
+          <div class="ep-icon"><i class="fa-solid fa-image"></i></div>
+          <span class="ep-method">GET</span>
+        </div>
+        <div class="ep-path">/api/wallpaperaccess</div>
+        <p class="ep-desc">Direct image download by numeric ID. Search is gated by Cloudflare on wallpaperaccess.com — grab IDs from their site, fetch here.</p>
+        <div class="ep-params">
+          <span class="param"><strong>id</strong> numeric id (required)</span>
+        </div>
+        <div class="ep-example">
+          <code>/api/wallpaperaccess?id=12578</code>
+          <button class="copy-btn" data-copy="/api/wallpaperaccess?id=12578">Copy</button>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- ENDPOINTS — bento asymmetric -->
-  <section class="endpoints reveal" id="endpoints">
-    <div class="container">
-      <div class="endpoints-head">
-        <div class="tag">// endpoints</div>
-        <h2>Six routes. Zero friction.</h2>
+  <div class="grad-line"></div>
+
+  <!-- EXAMPLES -->
+  <section id="examples" style="margin-top: 80px;">
+    <div class="section-head fade-in">
+      <div class="kicker">response shape</div>
+      <h2>What you get back.</h2>
+      <p>Every endpoint returns clean JSON with deduped media, totals, and a <code>cached</code> flag. No scraping the source HTML on your end.</p>
+    </div>
+
+    <div class="demo-row">
+      <div class="demo-col fade-in">
+        <h3>Request</h3>
+        <div class="code-block">
+<span class="tok-cm"># Curl — flat URL array</span>
+<span class="tok-key">curl</span> <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/wallhaven?q=anime&limit=3&format=urls"</span>
+        </div>
       </div>
-      <div class="ep-grid">
-        <div class="ep-card highlight">
-          <div class="ep-route"><span class="ep-method">GET</span> /api/wallhaven</div>
-          <p class="ep-desc">Curated wallpapers from Wallhaven. Filter by query, category, purity, sorting. Returns full metadata + multiple CDN sizes.</p>
-          <div class="ep-params">
-            <span class="param"><b>q</b>=string</span>
-            <span class="param"><b>page</b>=int</span>
-            <span class="param"><b>limit</b>=int</span>
-            <span class="param"><b>sorting</b>=string</span>
-            <span class="param"><b>categories</b>=int</span>
-          </div>
+      <div class="demo-col fade-in">
+        <h3>Response</h3>
+        <div class="code-block">
+<span class="tok-pun">[</span>
+  <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/dl?source=wallhaven&id=j37zv5"</span><span class="tok-pun">,</span>
+  <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/dl?source=wallhaven&id=n657lq"</span><span class="tok-pun">,</span>
+  <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/dl?source=wallhaven&id=w81wwp"</span>
+<span class="tok-pun">]</span>
         </div>
-        <div class="ep-card">
-          <div class="ep-route"><span class="ep-method">GET</span> /api/wallpaperaccess</div>
-          <p class="ep-desc">Tagged wallpaper collections. Categories, popular tags, full-size images via proxy.</p>
-          <div class="ep-params">
-            <span class="param"><b>tag</b>=string</span>
-            <span class="param"><b>category</b>=string</span>
-            <span class="param"><b>page</b>=int</span>
-            <span class="param"><b>limit</b>=int</span>
-          </div>
+      </div>
+    </div>
+
+    <div class="demo-row" style="margin-top: 16px;">
+      <div class="demo-col fade-in">
+        <h3>Full metadata request</h3>
+        <div class="code-block">
+<span class="tok-cm"># Default mode — full result objects</span>
+<span class="tok-key">curl</span> <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/wallhaven?q=anime&limit=1"</span>
         </div>
-        <div class="ep-card">
-          <div class="ep-route"><span class="ep-method">GET</span> /api/workshop</div>
-          <p class="ep-desc">Steam Workshop Wallpaper Engine items. Animated + static from creator community.</p>
-          <div class="ep-params">
-            <span class="param"><b>query</b>=string</span>
-            <span class="param"><b>appid</b>=int</span>
-            <span class="param"><b>page</b>=int</span>
-            <span class="param"><b>limit</b>=int</span>
-          </div>
-        </div>
-        <div class="ep-card">
-          <div class="ep-route"><span class="ep-method">GET</span> /api/dl</div>
-          <p class="ep-desc">Browser-direct download proxy. Pass any image URL — server streams bytes back.</p>
-          <div class="ep-params">
-            <span class="param"><b>url</b>=string</span>
-          </div>
+      </div>
+      <div class="demo-col fade-in">
+        <h3>Full metadata response</h3>
+        <div class="code-block" style="max-height: 340px; overflow-y: auto;">
+<span class="tok-pun">{</span>
+  <span class="tok-key">"ok"</span><span class="tok-pun">:</span> <span class="tok-bool">true</span><span class="tok-pun">,</span>
+  <span class="tok-key">"owner"</span><span class="tok-pun">:</span> <span class="tok-str">"@zade4everbot"</span><span class="tok-pun">,</span>
+  <span class="tok-key">"source"</span><span class="tok-pun">:</span> <span class="tok-str">"wallhaven"</span><span class="tok-pun">,</span>
+  <span class="tok-key">"query"</span><span class="tok-pun">:</span> <span class="tok-pun">{</span> <span class="tok-key">"q"</span><span class="tok-pun">:</span> <span class="tok-str">"anime"</span><span class="tok-pun">,</span> <span class="tok-key">"page"</span><span class="tok-pun">:</span> <span class="tok-num">1</span> <span class="tok-pun">}</span><span class="tok-pun">,</span>
+  <span class="tok-key">"total_results"</span><span class="tok-pun">:</span> <span class="tok-num">24</span><span class="tok-pun">,</span>
+  <span class="tok-key">"returned"</span><span class="tok-pun">:</span> <span class="tok-num">1</span><span class="tok-pun">,</span>
+  <span class="tok-key">"cached"</span><span class="tok-pun">:</span> <span class="tok-bool">false</span><span class="tok-pun">,</span>
+  <span class="tok-key">"results"</span><span class="tok-pun">:</span> <span class="tok-pun">[{</span>
+    <span class="tok-key">"id"</span><span class="tok-pun">:</span> <span class="tok-str">"j37zv5"</span><span class="tok-pun">,</span>
+    <span class="tok-key">"source"</span><span class="tok-pun">:</span> <span class="tok-str">"wallhaven"</span><span class="tok-pun">,</span>
+    <span class="tok-key">"title"</span><span class="tok-pun">:</span> <span class="tok-str">"wallhaven-j37zv5"</span><span class="tok-pun">,</span>
+    <span class="tok-key">"thumb"</span><span class="tok-pun">:</span> <span class="tok-str">"https://th.wallhaven.cc/small/j3/j37zv5.jpg"</span><span class="tok-pun">,</span>
+    <span class="tok-key">"full_url"</span><span class="tok-pun">:</span> <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/dl?..."</span><span class="tok-pun">,</span>
+    <span class="tok-key">"cdn_url_png"</span><span class="tok-pun">:</span> <span class="tok-str">"https://w.wallhaven.cc/full/j3/wallhaven-j37zv5.png"</span>
+  <span class="tok-pun">}]</span>
+<span class="tok-pun">}</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PLAYGROUND -->
-  <section class="playground reveal" id="playground">
-    <div class="container">
-      <div class="endpoints-head">
-        <div class="tag">// playground</div>
-        <h2>Try it live</h2>
-      </div>
-      <div class="playground-box">
-        <div class="playground-bar">
-          <span class="method">GET</span>
-          <input type="text" id="pg-url" value="/api/wallhaven?q=space&limit=4" placeholder="/api/wallhaven?q=nature&limit=6" />
-          <button class="go-btn" onclick="runPlayground()">Run</button>
-        </div>
-        <div class="playground-result" id="pg-result">
-          <span style="color:var(--text-dim);">// click "Run" to see the response</span>
-        </div>
-      </div>
+  <!-- JS USAGE -->
+  <section id="usage">
+    <div class="section-head fade-in">
+      <div class="kicker">drop-in code</div>
+      <h2>Use it in 3 lines.</h2>
+      <p>No SDK. No npm install. Just <code>fetch</code>.</p>
     </div>
-  </section>
 
-  <!-- USAGE EXAMPLES -->
-  <section class="examples reveal" id="examples">
-    <div class="container">
-      <div class="endpoints-head">
-        <div class="tag">// examples</div>
-        <h2>Copy-paste ready</h2>
+    <div class="demo-row">
+      <div class="demo-col fade-in">
+        <h3>JavaScript</h3>
+        <div class="code-block">
+<span class="tok-cm">// Fetch 3 anime wallpapers as URLs</span>
+<span class="tok-key">const</span> urls = <span class="tok-key">await</span> <span class="tok-key">fetch</span><span class="tok-pun">(</span>
+  <span class="tok-str">'/api/wallhaven?q=anime&limit=3&format=urls'</span>
+<span class="tok-pun">).</span><span class="tok-key">then</span><span class="tok-pun">(</span><span class="tok-key">r</span> =&gt; <span class="tok-key">r</span><span class="tok-pun">.</span><span class="tok-key">json</span><span class="tok-pun">())</span><span class="tok-pun">;</span>
+
+<span class="tok-cm">// Render in &lt;img&gt;</span>
+urls<span class="tok-pun">.</span><span class="tok-key">forEach</span><span class="tok-pun">(</span><span class="tok-key">u</span> =&gt; <span class="tok-pun">{</span>
+  document<span class="tok-pun">.</span>body<span class="tok-pun">.</span>innerHTML += <span class="tok-str">`&lt;img src="${u}"&gt;`</span><span class="tok-pun">;</span>
+<span class="tok-pun">})</span><span class="tok-pun">;</span>
+        </div>
       </div>
-      <div class="examples-grid">
-        <div class="example-block">
-          <div class="example-tab"><span class="lang">JavaScript</span></div>
-          <div class="example-code"><span style="color:#c792ea">const</span> res = <span style="color:#c792ea">await</span> <span style="color:#82aaff">fetch</span>(<span style="color:#c3e88d">'/api/wallhaven?q=nature&limit=6'</span>);
-<span style="color:#c792ea">const</span> data = <span style="color:#c792ea">await</span> res.<span style="color:#82aaff">json</span>();
+      <div class="demo-col fade-in">
+        <h3>Python</h3>
+        <div class="code-block">
+<span class="tok-key">import</span> requests
 
-data.results.<span style="color:#82aaff">forEach</span>(wp => {
-  console.<span style="color:#82aaff">log</span>(wp.url);
-});
+<span class="tok-cm"># Get a flat URL list</span>
+urls = requests<span class="tok-pun">.</span>get<span class="tok-pun">(</span>
+    <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/wallhaven"</span><span class="tok-pun">,</span>
+    params=<span class="tok-pun">{</span><span class="tok-str">"q"</span><span class="tok-pun">:</span> <span class="tok-str">"anime"</span><span class="tok-pun">,</span> <span class="tok-str">"limit"</span><span class="tok-pun">:</span> <span class="tok-num">3</span><span class="tok-pun">,</span> <span class="tok-str">"format"</span><span class="tok-pun">:</span> <span class="tok-str">"urls"</span><span class="tok-pun">}</span>
+<span class="tok-pun">).</span>json<span class="tok-pun">()</span>
 
-<span style="color:#546e7a">// direct download</span>
-window.location.href =
-  <span style="color:#c3e88d">`/api/dl?url=${encodeURIComponent(wp.url)}`</span>;</div>
-        </div>
-        <div class="example-block">
-          <div class="example-tab"><span class="lang">Python</span></div>
-          <div class="example-code"><span style="color:#c792ea">import</span> requests
-
-r = requests.<span style="color:#82aaff">get</span>(
-    <span style="color:#c3e88d">"https://zade-wallpaper-api.vercel.app/api/wallhaven"</span>,
-    params={<span style="color:#c3e88d">"q"</span>: <span style="color:#c3e88d">"nature"</span>, <span style="color:#c3e88d">"limit"</span>: <span style="color:#f78c6c">6</span>}
-)
-data = r.<span style="color:#82aaff">json</span>()
-
-<span style="color:#c792ea">for</span> wp <span style="color:#c792ea">in</span> data[<span style="color:#c3e88d">"results"</span>]:
-    <span style="color:#82aaff">print</span>(wp[<span style="color:#c3e88d">"url"</span>])</div>
-        </div>
-        <div class="example-block">
-          <div class="example-tab"><span class="lang">curl</span></div>
-          <div class="example-code"><span style="color:#546e7a"># fetch wallpapers</span>
-curl <span style="color:#c3e88d">"https://zade-wallpaper-api.vercel.app/api/wallhaven?q=nature&limit=6"</span>
-
-<span style="color:#546e7a"># direct download via proxy</span>
-curl <span style="color:#c3e88d">"https://zade-wallpaper-api.vercel.app/api/dl?url=CDN_URL"</span> \
-  -o wallpaper.jpg</div>
-        </div>
-        <div class="example-block">
-          <div class="example-tab"><span class="lang">JSON Response</span></div>
-          <div class="example-code">{
-  <span style="color:#82aaff">"source"</span>: <span style="color:#c3e88d">"wallhaven"</span>,
-  <span style="color:#82aaff">"query"</span>: <span style="color:#c3e88d">"nature"</span>,
-  <span style="color:#82aaff">"total"</span>: <span style="color:#f78c6c">6</span>,
-  <span style="color:#82aaff">"cached"</span>: <span style="color:#c792ea">false</span>,
-  <span style="color:#82aaff">"owner"</span>: <span style="color:#c3e88d">"@zade4everbot"</span>,
-  <span style="color:#82aaff">"results"</span>: [
-    {
-      <span style="color:#82aaff">"url"</span>: <span style="color:#c3e88d">"https://cdn.wallhaven.cc/..."</span>,
-      <span style="color:#82aaff">"thumb"</span>: <span style="color:#c3e88d">"https://w.wallhaven.cc/..."</span>,
-      <span style="color:#82aaff">"source_url"</span>: <span style="color:#c3e88d">"https://wallhaven.cc/w/..."</span>
-    }
-  ]
-}</div>
+<span class="tok-key">for</span> url <span class="tok-key">in</span> urls<span class="tok-pun">:</span>
+    <span class="tok-key">print</span><span class="tok-pun">(</span>url<span class="tok-pun">)</span>
         </div>
       </div>
     </div>
@@ -852,98 +823,115 @@ curl <span style="color:#c3e88d">"https://zade-wallpaper-api.vercel.app/api/dl?u
 
   <!-- FOOTER -->
   <footer>
-    <div class="container footer-inner">
-      <div class="footer-left">
-        Built by <a href="https://t.me/zade4everbot" target="_blank" rel="noopener">@zade4everbot</a> · Powered by Vercel
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="/" class="logo">
+          <div class="logo-mark"><i class="fa-solid fa-image"></i></div>
+          <span class="logo-name">zade-wallpaper-api</span>
+        </a>
+        <p>Built by Zora AI for @zade4everbot. Deployed on Vercel edge. Sources: Wallhaven, Steam Workshop, WallpaperAccess.</p>
       </div>
-      <div class="footer-links">
-        <a href="https://github.com/zedxlab/zade-wallpaper-api" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://t.me/zade4everbot" target="_blank" rel="noopener">Telegram</a>
-        <a href="/api" target="_blank" rel="noopener">API</a>
+      <div class="footer-col">
+        <h4>API</h4>
+        <a href="/api/wallhaven">/api/wallhaven</a>
+        <a href="/api/dl">/api/dl</a>
+        <a href="/api/workshop">/api/workshop</a>
+        <a href="/api/wallpaperaccess">/api/wallpaperaccess</a>
+        <a href="/api">/api (index)</a>
       </div>
+      <div class="footer-col">
+        <h4>Project</h4>
+        <a href="https://github.com/zedxlab/zade-wallpaper-api" target="_blank" rel="noopener">GitHub repo</a>
+        <a href="https://vercel.com" target="_blank" rel="noopener">Powered by Vercel</a>
+        <a href="#endpoints">Documentation</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 zade-wallpaper-api — Owner @zade4everbot</span>
+      <span>Built by Zora AI by Zade</span>
     </div>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script>
-    // ============================================================
-    // LIVE MOSAIC — fetches from /api/wallhaven
-    // ============================================================
-    (async () => {
-      const mosaic = document.getElementById('mosaic');
-      const countEl = document.getElementById('mosaic-count');
-      try {
-        const res = await fetch('/api/wallhaven?q=wallpaper&limit=10');
-        const data = await res.json();
-        const items = (data.results || []).slice(0, 10);
-        countEl.textContent = items.length + ' wallpapers';
-        mosaic.innerHTML = '';
-        items.forEach((wp, i) => {
-          const div = document.createElement('div');
-          div.className = 'mosaic-item' + (i % 5 === 0 ? ' span-2 span-row' : '');
-          const img = document.createElement('img');
-          img.loading = 'lazy';
-          img.src = wp.thumb || wp.url;
-          img.alt = wp.filename || 'wallpaper';
-          img.onerror = () => { img.src = wp.url; };
-          div.appendChild(img);
-          div.onclick = () => window.open(wp.url, '_blank');
-          mosaic.appendChild(div);
-        });
-      } catch (e) {
-        mosaic.innerHTML = '<div class="mosaic-loader">Failed to load wallpapers</div>';
-      }
-    })();
+    gsap.registerPlugin(ScrollTrigger);
 
-    // ============================================================
-    // PLAYGROUND
-    // ============================================================
-    async function runPlayground() {
-      const input = document.getElementById('pg-url');
-      const result = document.getElementById('pg-result');
-      const url = input.value.startsWith('/') ? input.value : '/' + input.value;
-      result.innerHTML = '<span style="color:var(--text-dim)">loading…</span>';
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        result.innerHTML = syntaxHighlightJSON(JSON.stringify(data, null, 2));
-      } catch (e) {
-        result.innerHTML = '<span style="color:#f78c6c">Error: ' + e.message + '</span>';
-      }
-    }
+    // Hero entrance
+    gsap.to('.hero .fade-in', {
+      opacity: 1, y: 0, duration: 0.9, stagger: 0.12, ease: 'power3.out', delay: 0.05
+    });
 
-    function syntaxHighlightJSON(json) {
-      return json
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
-        .replace(/: "([^"]*)"/g, ': <span class="json-str">"$1"</span>')
-        .replace(/: (\d+\.?\d*)/g, ': <span class="json-num">$1</span>')
-        .replace(/: (true|false|null)/g, ': <span class="json-bool">$1</span>');
-    }
-
-    // ============================================================
-    // COPY BUTTON
-    // ============================================================
-    function copyCode(btn, pre) {
-      navigator.clipboard.writeText(pre.innerText).then(() => {
-        btn.textContent = 'Copied';
-        btn.style.color = 'var(--accent)';
-        setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 1500);
+    // Scroll fade-ins
+    gsap.utils.toArray('section .fade-in').forEach(el => {
+      gsap.to(el, {
+        opacity: 1, y: 0, duration: 0.75, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%' }
       });
+    });
+
+    // Stagger cards
+    gsap.to('.stagger-card', {
+      opacity: 1, y: 0, duration: 0.65, stagger: 0.08, ease: 'power3.out',
+      scrollTrigger: { trigger: '.stats-grid', start: 'top 85%' }
+    });
+    gsap.to('.endpoints .stagger-card', {
+      opacity: 1, y: 0, duration: 0.65, stagger: 0.1, ease: 'power3.out',
+      scrollTrigger: { trigger: '.endpoints', start: 'top 80%' }
+    });
+
+    // Stat counters
+    document.querySelectorAll('.stat-val[data-target]').forEach(el => {
+      const target = parseInt(el.dataset.target, 10);
+      const suffix = el.dataset.suffix || '';
+      const obj = { v: 0 };
+      gsap.to(obj, {
+        v: target, duration: 1.4, ease: 'power2.out',
+        scrollTrigger: { trigger: el, start: 'top 90%' },
+        onUpdate: () => { el.textContent = Math.round(obj.v) + suffix; }
+      });
+    });
+
+    // Live gallery
+    const gallery = document.getElementById('gallery');
+    const searchQ = document.getElementById('searchQ');
+    const searchBtn = document.getElementById('searchBtn');
+
+    async function loadGallery(q) {
+      gallery.innerHTML = Array(8).fill(0).map(() => '<div class="gallery-skeleton"></div>').join('');
+      try {
+        const r = await fetch(`/api/wallhaven?q=${encodeURIComponent(q)}&limit=8`);
+        const data = await r.json();
+        const items = (data.results || []).map(item => `
+          <a href="${item.full_url}" target="_blank" rel="noopener" class="gallery-item">
+            <img src="${item.thumb}" alt="${item.title}" loading="lazy" />
+            <div class="overlay">${item.id}</div>
+          </a>
+        `).join('');
+        gallery.innerHTML = items || '<div style="color:var(--text-dim);padding:24px;font-size:13px;">No results.</div>';
+      } catch {
+        gallery.innerHTML = '<div style="color:var(--text-dim);padding:24px;font-size:13px;">Failed to load. Try again.</div>';
+      }
     }
 
-    // ============================================================
-    // SCROLL REVEAL
-    // ============================================================
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          revealObserver.unobserve(entry.target);
+    searchBtn.addEventListener('click', () => loadGallery(searchQ.value || 'anime'));
+    searchQ.addEventListener('keydown', e => { if (e.key === 'Enter') loadGallery(searchQ.value || 'anime'); });
+    loadGallery('anime sunset');
+
+    // Copy buttons
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const text = btn.dataset.copy;
+        try { await navigator.clipboard.writeText(text); } catch {
+          const ta = document.createElement('textarea');
+          ta.value = text; document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); ta.remove();
         }
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
       });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    });
   </script>
 </body>
-</html>
+                                           </html>
