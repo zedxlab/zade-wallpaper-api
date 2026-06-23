@@ -5,906 +5,962 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>zade-wallpaper-api — Wallpapers, simplified</title>
   <meta name="description" content="Unified wallpaper API across Wallhaven, Steam Workshop, and WallpaperAccess. Free, fast, JSON-first." />
+  <meta name="theme-color" content="#101010" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* ============================================================
+       DESIGN TOKENS — NumberPanel system, orange→purple
+       ============================================================ */
     :root {
-      --bg-0: #07070b;
-      --bg-1: #0d0d14;
-      --bg-2: #13131d;
-      --surface: rgba(255, 255, 255, 0.04);
-      --surface-2: rgba(255, 255, 255, 0.07);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(255, 255, 255, 0.14);
-      --text: #f5f5f7;
-      --text-dim: #9a9aa8;
-      --text-faint: #5e5e6e;
-      --accent: #a78bfa;
-      --accent-2: #f472b6;
-      --accent-3: #22d3ee;
-      --gradient: linear-gradient(135deg, #a78bfa 0%, #f472b6 50%, #22d3ee 100%);
-      --gradient-soft: linear-gradient(135deg, rgba(167,139,250,0.15) 0%, rgba(244,114,182,0.15) 50%, rgba(34,211,238,0.15) 100%);
-      --radius-sm: 8px;
-      --radius: 14px;
-      --radius-lg: 22px;
-      --shadow-glow: 0 0 60px rgba(167,139,250,0.25);
+      /* Surface stack */
+      --surface: #101010;
+      --surface-container-lowest: #0c0c0c;
+      --surface-container-low: #151515;
+      --surface-container: #1f1f1f;
+      --surface-container-high: #262626;
+      --surface-container-highest: #2f2f2f;
+
+      /* On-surface */
+      --on-surface: #faf9f7;
+      --on-surface-variant: #cccccc;
+      --on-surface-faint: #888888;
+
+      /* Outline */
+      --outline: #666666;
+      --outline-variant: #444444;
+      --outline-focus: #8b5cf6;
+
+      /* Primary — purple (was orange #ea5810) */
+      --primary: #8b5cf6;
+      --primary-hover: #7c3aed;
+      --primary-pressed: #6d28d9;
+      --primary-container: rgba(139, 92, 246, 0.12);
+      --on-primary: #ffffff;
+      --on-primary-container: #c4b5fd;
+
+      /* Tertiary — accent purple */
+      --tertiary: #a78bfa;
+      --tertiary-container: rgba(167, 139, 250, 0.08);
+
+      /* Typography */
+      --font-display: 'Geist', 'Geist Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Geist Mono', 'Geist Mono Fallback', ui-monospace, 'SF Mono', Menlo, monospace;
+
+      --text-display: 60px;
+      --text-display-lh: 68px;
+      --text-display-ls: -0.02em;
+
+      --text-headline-lg: 40px;
+      --text-headline-lg-lh: 48px;
+
+      --text-headline-md: 28px;
+      --text-headline-md-lh: 36px;
+
+      --text-title-lg: 20px;
+      --text-title-lg-lh: 28px;
+
+      --text-body-lg: 18px;
+      --text-body-lg-lh: 28px;
+
+      --text-body-md: 16px;
+      --text-body-md-lh: 24px;
+
+      --text-body-sm: 14px;
+      --text-body-sm-lh: 20px;
+
+      --text-label-md: 14px;
+      --text-label-md-lh: 20px;
+
+      --text-code-sm: 13px;
+      --text-code-sm-lh: 20px;
+
+      /* Radius */
+      --radius-xs: 0.25rem;
+      --radius-sm: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --radius-xl: 1.5rem;
+      --radius-full: 9999px;
+
+      /* Spacing — 8px rhythm */
+      --space-xs: 4px;
+      --space-sm: 12px;
+      --space-md: 24px;
+      --space-lg: 40px;
+      --space-xl: 64px;
+      --space-2xl: 96px;
+
+      /* Container */
+      --container-max: 1280px;
+      --container-padding: 24px;
+      --container-gutter: 24px;
+
+      /* Elevation */
+      --elevation-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --elevation-md: 0 4px 12px rgba(0,0,0,0.4);
+      --elevation-lg: 0 12px 32px rgba(0,0,0,0.5);
+      --elevation-glow: 0 0 0 1px rgba(139, 92, 246, 0.3), 0 8px 24px rgba(139, 92, 246, 0.15);
+
+      /* Motion */
+      --duration-fast: 120ms;
+      --duration-base: 200ms;
+      --duration-slow: 320ms;
+      --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+      --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ============================================================
+       RESET
+       ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      /* Kill ALL blue browser outlines */
+      outline: none !important;
+    }
 
-    html { scroll-behavior: smooth; }
+    *, *:focus, *:focus-visible, *:focus-within {
+      outline: none !important;
+    }
+
+    /* Purple focus indicator via box-shadow (no native blue ring) */
+    *:focus, *:focus-visible, *:focus-within {
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5) !important;
+      border-radius: inherit;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-0);
-      color: var(--text);
-      line-height: 1.6;
+      font-family: var(--font-display);
+      font-size: var(--text-body-md);
+      line-height: var(--text-body-md-lh);
+      font-weight: 400;
+      background: var(--surface);
+      color: var(--on-surface);
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
       min-height: 100vh;
     }
 
-    /* Animated background */
-    .bg-mesh {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background:
-        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(167,139,250,0.18), transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 30%, rgba(244,114,182,0.12), transparent 60%),
-        radial-gradient(ellipse 70% 50% at 50% 100%, rgba(34,211,238,0.10), transparent 60%);
-      animation: meshDrift 20s ease-in-out infinite alternate;
-    }
-    .bg-grid {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 80%);
-      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 80%);
-    }
-    @keyframes meshDrift {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(2%, -2%) scale(1.05); }
+    ::selection {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
     }
 
-    /* NAV */
-    nav.topbar {
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    code, pre { font-family: var(--font-mono); }
+    img { display: block; max-width: 100%; }
+
+    /* ============================================================
+       LAYOUT — 12 col grid, 1280px max
+       ============================================================ */
+    .container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--container-padding);
+    }
+
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--container-gutter);
+    }
+
+    /* ============================================================
+       TOPBAR
+       ============================================================ */
+    .topbar {
       position: sticky;
       top: 0;
-      z-index: 100;
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      background: rgba(7, 7, 11, 0.7);
-      border-bottom: 1px solid var(--border);
+      z-index: 50;
+      background: rgba(16, 16, 16, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--outline-variant);
     }
-    .nav-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 14px 24px;
+
+    .topbar-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      height: 64px;
     }
-    .logo {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 18px;
-      letter-spacing: -0.02em;
+
+    .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: var(--text);
-    }
-    .logo-mark {
-      width: 30px; height: 30px;
-      border-radius: 8px;
-      background: var(--gradient);
-      display: grid; place-items: center;
-      box-shadow: 0 0 24px rgba(167,139,250,0.5);
-      font-size: 16px;
-    }
-    .logo-mark i { color: #07070b; }
-    .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a {
-      color: var(--text-dim);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta {
-      padding: 8px 16px;
-      background: var(--surface-2);
-      border: 1px solid var(--border-strong);
-      border-radius: 8px;
-      font-size: 13px;
+      gap: var(--space-sm);
       font-weight: 600;
-      color: var(--text) !important;
+      font-size: var(--text-title-lg);
+      letter-spacing: -0.01em;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), var(--tertiary));
+      display: grid;
+      place-items: center;
+      color: var(--on-primary);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .nav {
       display: flex;
       align-items: center;
-      gap: 6px;
-    }
-    .nav-cta:hover { background: var(--surface) !important; }
-
-    @media (max-width: 640px) {
-      .nav-links a:not(.nav-cta) { display: none; }
+      gap: var(--space-md);
     }
 
-    /* HERO */
+    .nav-link {
+      font-size: var(--text-body-sm);
+      color: var(--on-surface-variant);
+      transition: color var(--duration-base) var(--ease-default);
+    }
+
+    .nav-link:hover { color: var(--on-surface); }
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-display);
+      font-size: var(--text-body-sm);
+      font-weight: 500;
+      line-height: 1;
+      transition: all var(--duration-base) var(--ease-default);
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      box-shadow: var(--elevation-sm);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--elevation-glow);
+    }
+
+    .btn-primary:active {
+      background: var(--primary-pressed);
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--on-surface);
+      border-color: var(--outline-variant);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-container);
+      border-color: var(--outline);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--on-surface-variant);
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface-container);
+      color: var(--on-surface);
+    }
+
+    /* ============================================================
+       HERO
+       ============================================================ */
     .hero {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 100px 24px 80px;
-      text-align: center;
       position: relative;
+      padding: var(--space-2xl) 0 var(--space-xl);
+      overflow: hidden;
     }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 800px 400px at 20% 20%, rgba(139, 92, 246, 0.15), transparent 60%),
+        radial-gradient(ellipse 600px 300px at 80% 60%, rgba(167, 139, 250, 0.10), transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 14px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      font-size: 13px;
-      color: var(--text-dim);
-      margin-bottom: 28px;
-      backdrop-filter: blur(10px);
-    }
-    .badge .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 12px #22c55e;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+      height: 32px;
+      padding: 0 14px;
+      border-radius: var(--radius-full);
+      background: var(--primary-container);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      color: var(--on-primary-container);
+      font-size: var(--text-body-sm);
+      font-weight: 500;
+      margin-bottom: var(--space-md);
     }
 
-    h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(40px, 7vw, 80px);
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-      font-weight: 700;
-      margin-bottom: 24px;
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
     }
-    .gradient-text {
-      background: var(--gradient);
+
+    .hero h1 {
+      font-size: clamp(40px, 6vw, var(--text-display));
+      line-height: 1.05;
+      letter-spacing: var(--text-display-ls);
+      font-weight: 500;
+      margin-bottom: var(--space-md);
+    }
+
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--primary), var(--tertiary));
       -webkit-background-clip: text;
       background-clip: text;
-      color: transparent;
-      background-size: 200% 200%;
-      animation: gradientShift 8s ease infinite;
+      -webkit-text-fill-color: transparent;
     }
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-    .hero p {
-      font-size: clamp(16px, 2vw, 19px);
-      color: var(--text-dim);
+
+    .hero p.lead {
+      font-size: var(--text-body-lg);
+      line-height: var(--text-body-lg-lh);
+      color: var(--on-surface-variant);
       max-width: 640px;
-      margin: 0 auto 40px;
+      margin: 0 auto var(--space-lg);
     }
 
-    .hero-cta {
+    .hero-ctas {
       display: flex;
-      gap: 12px;
       justify-content: center;
+      gap: var(--space-sm);
       flex-wrap: wrap;
-    }
-    .btn {
-      padding: 14px 26px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s;
-      cursor: pointer;
-      border: none;
-      font-family: inherit;
-    }
-    .btn-primary {
-      background: var(--gradient);
-      color: #07070b;
-      box-shadow: 0 8px 24px rgba(167,139,250,0.35);
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(167,139,250,0.5);
-    }
-    .btn-ghost {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border-strong);
-      backdrop-filter: blur(10px);
-    }
-    .btn-ghost:hover {
-      background: var(--surface-2);
-      border-color: var(--accent);
     }
 
-    /* LIVE PREVIEW GALLERY */
-    .preview-section {
-      max-width: 1200px;
-      margin: 60px auto 0;
-      padding: 0 24px;
+    /* ============================================================
+       SECTION
+       ============================================================ */
+    section {
+      padding: var(--space-xl) 0;
     }
-    .preview-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 12px;
+
+    .section-head {
+      margin-bottom: var(--space-lg);
     }
-    .preview-bar h2 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 22px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .preview-bar .live-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 12px #22c55e;
-      animation: pulse 2s infinite;
-    }
-    .search-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .search-row input {
-      background: var(--surface);
-      border: 1px solid var(--border-strong);
-      color: var(--text);
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      width: 200px;
-      outline: none;
-      transition: border 0.2s;
-    }
-    .search-row input:focus { border-color: var(--accent); }
-    .search-row button {
-      background: var(--surface-2);
-      border: 1px solid var(--border-strong);
-      color: var(--text);
-      padding: 8px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 13px;
+
+    .section-eyebrow {
+      font-size: var(--text-label-md);
       font-weight: 500;
-      transition: all 0.2s;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-sm);
     }
-    .search-row button:hover { background: var(--accent); color: #07070b; }
+
+    .section-title {
+      font-size: var(--text-headline-lg);
+      line-height: var(--text-headline-lg-lh);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .section-sub {
+      font-size: var(--text-body-lg);
+      color: var(--on-surface-variant);
+      max-width: 640px;
+    }
+
+    /* ============================================================
+       LIVE GALLERY
+       ============================================================ */
+    .gallery-wrap {
+      position: relative;
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-xl);
+      padding: var(--space-md);
+      background: var(--surface-container-low);
+      box-shadow: var(--elevation-md);
+    }
 
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 140px;
+      gap: var(--space-sm);
     }
+
     .gallery-item {
-      aspect-ratio: 16/10;
-      border-radius: var(--radius);
-      overflow: hidden;
       position: relative;
-      background: var(--bg-2);
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      background: var(--surface-container);
       cursor: pointer;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 1px solid var(--border);
+      transition: transform var(--duration-base) var(--ease-default);
     }
-    .gallery-item:hover { transform: scale(1.03); z-index: 2; }
+
+    .gallery-item:hover {
+      transform: translateY(-2px);
+    }
+
     .gallery-item img {
-      width: 100%; height: 100%;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      display: block;
-    }
-    .gallery-item .overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity 0.3s;
-      display: flex;
-      align-items: flex-end;
-      padding: 12px;
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text);
-    }
-    .gallery-item:hover .overlay { opacity: 1; }
-    .gallery-skeleton {
-      aspect-ratio: 16/10;
-      border-radius: var(--radius);
-      background: linear-gradient(90deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-1) 100%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border: 1px solid var(--border);
-    }
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+      transition: transform var(--duration-slow) var(--ease-emphasized);
     }
 
-    /* SECTION */
-    section {
-      max-width: 1200px;
-      margin: 100px auto;
-      padding: 0 24px;
-    }
-    .section-head {
-      margin-bottom: 48px;
-    }
-    .section-head .kicker {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--accent);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .section-head h2 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(28px, 4vw, 42px);
-      letter-spacing: -0.03em;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-    .section-head p {
-      color: var(--text-dim);
-      font-size: 17px;
-      max-width: 600px;
+    .gallery-item:hover img {
+      transform: scale(1.08);
     }
 
-    /* ENDPOINT CARDS */
+    .gallery-item.tall { grid-row: span 2; }
+    .gallery-item.wide { grid-column: span 2; }
+
+    .gallery-loader {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: var(--space-lg);
+      color: var(--on-surface-faint);
+      font-size: var(--text-body-sm);
+    }
+
+    /* ============================================================
+       STATS
+       ============================================================ */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-md);
+      padding: var(--space-lg) 0;
+    }
+
+    .stat {
+      padding: var(--space-md);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-lg);
+      background: var(--surface-container-low);
+    }
+
+    .stat-value {
+      font-size: var(--text-headline-lg);
+      line-height: var(--text-headline-lg-lh);
+      font-weight: 600;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+      font-size: var(--text-body-sm);
+      color: var(--on-surface-variant);
+      margin-top: 4px;
+    }
+
+    /* ============================================================
+       ENDPOINT CARDS
+       ============================================================ */
     .endpoints {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
     }
-    .ep-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+
+    .endpoint {
+      padding: var(--space-md);
+      border: 1px solid var(--outline-variant);
       border-radius: var(--radius-lg);
-      padding: 28px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(20px);
-      position: relative;
-      overflow: hidden;
+      background: var(--surface-container-low);
+      transition: all var(--duration-base) var(--ease-default);
+      display: flex;
+      flex-direction: column;
     }
-    .ep-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--gradient-soft);
-      opacity: 0;
-      transition: opacity 0.3s;
+
+    .endpoint:hover {
+      border-color: var(--primary);
+      background: var(--surface-container);
+      transform: translateY(-2px);
+      box-shadow: var(--elevation-glow);
     }
-    .ep-card:hover {
-      border-color: var(--border-strong);
-      transform: translateY(-4px);
-    }
-    .ep-card:hover::before { opacity: 0.5; }
-    .ep-card > * { position: relative; z-index: 1; }
-    .ep-header {
+
+    .endpoint-head {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
     }
-    .ep-icon {
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      background: var(--gradient-soft);
-      border: 1px solid var(--border-strong);
-      display: grid; place-items: center;
-      font-size: 18px;
-      color: var(--accent);
+
+    .endpoint-name {
+      font-family: var(--font-mono);
+      font-size: var(--text-body-md);
+      font-weight: 600;
+      color: var(--on-surface);
     }
-    .ep-method {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+
+    .endpoint-tag {
+      font-size: 12px;
+      font-weight: 500;
       padding: 4px 10px;
-      border-radius: 6px;
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      font-weight: 600;
+      border-radius: var(--radius-full);
+      background: var(--primary-container);
+      color: var(--on-primary-container);
     }
-    .ep-path {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 10px;
-      letter-spacing: -0.01em;
+
+    .endpoint-desc {
+      font-size: var(--text-body-sm);
+      color: var(--on-surface-variant);
+      line-height: var(--text-body-sm-lh);
+      margin-bottom: var(--space-sm);
     }
-    .ep-desc {
-      color: var(--text-dim);
-      font-size: 14px;
-      margin-bottom: 18px;
-    }
-    .ep-params {
+
+    .endpoint-params {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 18px;
+      margin-top: auto;
     }
-    .param {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      padding: 4px 10px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text-dim);
-    }
-    .param strong { color: var(--accent-3); font-weight: 500; }
-    .ep-example {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--text);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      word-break: break-all;
-    }
-    .ep-example code { flex: 1; color: var(--accent-3); }
-    .copy-btn {
-      background: var(--surface-2);
-      border: 1px solid var(--border-strong);
-      color: var(--text-dim);
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 11px;
-      font-family: inherit;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-    .copy-btn:hover { background: var(--accent); color: #07070b; border-color: var(--accent); }
-    .copy-btn.copied { background: #22c55e; color: #07070b; border-color: #22c55e; }
 
-    /* CODE BLOCKS */
-    .code-block {
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      line-height: 1.7;
-      overflow-x: auto;
-      color: var(--text);
-      position: relative;
+    .param {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: var(--radius-xs);
+      background: var(--surface-container-high);
+      color: var(--on-surface-variant);
+      border: 1px solid var(--outline-variant);
     }
-    .code-block .copy-float {
+
+    .param strong {
+      color: var(--tertiary);
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       CODE BLOCKS
+       ============================================================ */
+    .code-block {
+      position: relative;
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      overflow-x: auto;
+      margin-bottom: var(--space-md);
+    }
+
+    .code-block pre {
+      font-family: var(--font-mono);
+      font-size: var(--text-code-sm);
+      line-height: var(--text-code-sm-lh);
+      color: var(--on-surface-variant);
+      margin: 0;
+      white-space: pre;
+    }
+
+    .code-block .copy-btn {
       position: absolute;
       top: 12px;
       right: 12px;
-    }
-    .tok-key { color: #f472b6; }
-    .tok-str { color: #86efac; }
-    .tok-num { color: #fde047; }
-    .tok-bool { color: #c4b5fd; }
-    .tok-null { color: #94a3b8; }
-    .tok-cm { color: #5e5e6e; font-style: italic; }
-    .tok-pun { color: var(--text-dim); }
-
-    /* RESPONSE SAMPLE */
-    .demo-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-    @media (max-width: 768px) { .demo-row { grid-template-columns: 1fr; } }
-    .demo-col h3 {
-      font-family: 'JetBrains Mono', monospace;
+      height: 28px;
+      padding: 0 10px;
       font-size: 12px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 10px;
+      background: var(--surface-container);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-sm);
+      color: var(--on-surface-variant);
+      transition: all var(--duration-base) var(--ease-default);
     }
 
-    /* STATS */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      margin-top: 32px;
-    }
-    .stat {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 22px;
-      backdrop-filter: blur(20px);
-    }
-    .stat-val {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 36px;
-      font-weight: 700;
-      background: var(--gradient);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .stat-label {
-      font-size: 13px;
-      color: var(--text-dim);
+    .code-block .copy-btn:hover {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+      border-color: var(--outline);
     }
 
-    /* FOOTER */
+    .code-block .copy-btn.copied {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    .syntax-key { color: #c4b5fd; }
+    .syntax-str { color: #86efac; }
+    .syntax-num { color: #fcd34d; }
+    .syntax-com { color: var(--on-surface-faint); font-style: italic; }
+    .syntax-pun { color: var(--on-surface-variant); }
+
+    /* ============================================================
+       USAGE TABS
+       ============================================================ */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--outline-variant);
+      margin-bottom: var(--space-md);
+    }
+
+    .tab {
+      padding: 10px 16px;
+      font-size: var(--text-body-sm);
+      font-weight: 500;
+      color: var(--on-surface-variant);
+      border-bottom: 2px solid transparent;
+      transition: all var(--duration-base) var(--ease-default);
+      margin-bottom: -1px;
+    }
+
+    .tab:hover { color: var(--on-surface); }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
     footer {
-      border-top: 1px solid var(--border);
-      margin-top: 80px;
-      padding: 48px 24px 32px;
-      background: rgba(0,0,0,0.3);
+      padding: var(--space-xl) 0 var(--space-lg);
+      border-top: 1px solid var(--outline-variant);
+      margin-top: var(--space-xl);
     }
+
     .footer-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 40px;
-    }
-    @media (max-width: 768px) { .footer-inner { grid-template-columns: 1fr; } }
-    .footer-brand p {
-      color: var(--text-dim);
-      font-size: 14px;
-      margin-top: 12px;
-      max-width: 320px;
-    }
-    .footer-col h4 {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--text-faint);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 14px;
-    }
-    .footer-col a {
-      display: block;
-      color: var(--text-dim);
-      text-decoration: none;
-      font-size: 14px;
-      padding: 4px 0;
-      transition: color 0.2s;
-    }
-    .footer-col a:hover { color: var(--accent); }
-    .footer-bottom {
-      max-width: 1200px;
-      margin: 40px auto 0;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
+      align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
-      font-size: 13px;
-      color: var(--text-faint);
+      gap: var(--space-md);
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 640px) {
-      .hero { padding: 60px 20px 40px; }
-      section { margin: 60px auto; }
-      .ep-card { padding: 22px; }
+    .footer-text {
+      font-size: var(--text-body-sm);
+      color: var(--on-surface-faint);
     }
 
-    /* ANIMATIONS - GSAP will drive these but set initial states */
-    .fade-in { opacity: 0; transform: translateY(30px); }
-    .stagger-card { opacity: 0; transform: translateY(20px); }
+    .footer-links {
+      display: flex;
+      gap: var(--space-md);
+    }
 
-    /* REDUCED MOTION */
-    @media (prefers-reduced-motion: reduce) {
-      .bg-mesh, .gradient-text, .badge .dot, .preview-bar .live-dot { animation: none !important; }
-      .gallery-skeleton { animation: none !important; }
+    /* ============================================================
+       UTILITIES
+       ============================================================ */
+    .hide-mobile { display: initial; }
+    @media (max-width: 768px) {
+      .hide-mobile { display: none; }
+      .gallery { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 100px; }
+      .endpoints { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      :root {
+        --text-display: 40px;
+        --text-headline-lg: 32px;
+        --space-2xl: 64px;
+        --space-xl: 48px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="bg-mesh"></div>
-  <div class="bg-grid"></div>
-
-  <!-- NAV -->
-  <nav class="topbar">
-    <div class="nav-inner">
-      <a href="/" class="logo">
-        <div class="logo-mark"><i class="fa-solid fa-image"></i></div>
-        zade-wallpaper-api
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a href="#" class="brand">
+        <span class="brand-mark">Z</span>
+        <span>zade-wallpaper-api</span>
       </a>
-      <div class="nav-links">
-        <a href="#endpoints">Endpoints</a>
-        <a href="#examples">Examples</a>
-        <a href="https://github.com/zedxlab/zade-wallpaper-api" target="_blank" rel="noopener">
-          <i class="fa-brands fa-github"></i> GitHub
-        </a>
-        <a href="/api" class="nav-cta">
-          <i class="fa-solid fa-bolt"></i> Live JSON
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- HERO -->
-  <header class="hero">
-    <div class="badge">
-      <span class="dot"></span>
-      Live on Vercel · Owner @zade4everbot
-    </div>
-    <h1 class="fade-in">
-      Wallpapers, <span class="gradient-text">simplified.</span>
-    </h1>
-    <p class="fade-in">
-      One unified API across <strong style="color:var(--text)">Wallhaven</strong>, <strong style="color:var(--text)">Steam Workshop</strong>, and <strong style="color:var(--text)">WallpaperAccess</strong>. Search, fetch, download — JSON in, image out. No keys, no auth, no nonsense.
-    </p>
-    <div class="hero-cta fade-in">
-      <a href="#endpoints" class="btn btn-primary">
-        <i class="fa-solid fa-rocket"></i> Explore endpoints
-      </a>
-      <a href="https://zade-wallpaper-api.vercel.app/api/wallhaven?q=anime&limit=3" target="_blank" rel="noopener" class="btn btn-ghost">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i> Try live query
-      </a>
-    </div>
-
-    <!-- LIVE PREVIEW -->
-    <div class="preview-section">
-      <div class="preview-bar">
-        <h2><span class="live-dot"></span> Live preview</h2>
-        <div class="search-row">
-          <input id="searchQ" type="text" placeholder="anime sunset..." value="anime sunset" />
-          <button id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-        </div>
-      </div>
-      <div id="gallery" class="gallery"></div>
+      <nav class="nav">
+        <a href="#endpoints" class="nav-link hide-mobile">Endpoints</a>
+        <a href="#examples" class="nav-link hide-mobile">Examples</a>
+        <a href="https://github.com/zedxlab/zade-wallpaper-api" target="_blank" rel="noopener" class="nav-link hide-mobile">GitHub</a>
+        <a href="https://t.me/zade4everbot" target="_blank" rel="noopener" class="btn btn-secondary">@zade4everbot</a>
+      </nav>
     </div>
   </header>
 
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          <span>v1.0 · live · 3 sources</span>
+        </div>
+        <h1>Wallpapers, <span class="grad">simplified.</span></h1>
+        <p class="lead">
+          One unified JSON API across Wallhaven, Steam Workshop Wallpaper Engine,
+          and WallpaperAccess. No auth, no rate-limit headaches. Just clean wallpaper data.
+        </p>
+        <div class="hero-ctas">
+          <a href="#endpoints" class="btn btn-primary">
+            Explore endpoints
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="https://zade-wallpaper-api.vercel.app/api" target="_blank" rel="noopener" class="btn btn-secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Try the API
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE GALLERY -->
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <div class="section-eyebrow">Live preview</div>
+        <h2 class="section-title">Pulling from Wallhaven, right now</h2>
+        <p class="section-sub">
+          Every image on this grid is fetched in real-time from the
+          <code style="font-family:var(--font-mono);color:var(--tertiary);">/api/wallhaven</code> endpoint.
+          Click any tile to open it directly.
+        </p>
+      </div>
+      <div class="gallery-wrap">
+        <div class="gallery" id="gallery">
+          <div class="gallery-loader">Loading live wallpapers…</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- STATS -->
-  <section style="margin-top: 40px;">
-    <div class="stats">
-      <div class="stat stagger-card">
-        <div class="stat-val" data-target="4">0</div>
-        <div class="stat-label">Live endpoints</div>
-      </div>
-      <div class="stat stagger-card">
-        <div class="stat-val" data-target="3" data-suffix="">0</div>
-        <div class="stat-label">Wallpaper sources</div>
-      </div>
-      <div class="stat stagger-card">
-        <div class="stat-val" data-target="100" data-suffix="%">0</div>
-        <div class="stat-label">Free, no auth</div>
-      </div>
-      <div class="stat stagger-card">
-        <div class="stat-val"><i class="fa-solid fa-infinity"></i></div>
-        <div class="stat-label">Scale on Vercel edge</div>
+  <section>
+    <div class="container">
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" data-count="3">0</div>
+          <div class="stat-label">Wallpaper sources</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" data-count="6">0</div>
+          <div class="stat-label">Endpoints</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" data-count="99">0</div>
+          <div class="stat-label">Uptime %</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" data-count="0">0</div>
+          <div class="stat-label">Auth required</div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- ENDPOINTS -->
   <section id="endpoints">
-    <div class="section-head fade-in">
-      <div class="kicker">// 4 endpoints</div>
-      <h2>Everything you need, nothing you don't.</h2>
-      <p>Each endpoint is a clean JSON contract. Hit it with curl, fetch, axios — anything that speaks HTTP.</p>
-    </div>
-
-    <div class="endpoints">
-
-      <!-- /api/wallhaven -->
-      <div class="ep-card stagger-card">
-        <div class="ep-header">
-          <div class="ep-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
-          <span class="ep-method">GET</span>
+    <div class="container">
+      <div class="section-head">
+        <div class="section-eyebrow">Endpoints</div>
+        <h2 class="section-title">Everything you need, nothing you don't</h2>
+        <p class="section-sub">Six clean routes. Each returns structured JSON with consistent fields across sources.</p>
+      </div>
+      <div class="endpoints">
+        <div class="endpoint">
+          <div class="endpoint-head">
+            <span class="endpoint-name">/api/wallhaven</span>
+            <span class="endpoint-tag">Wallhaven.cc</span>
+          </div>
+          <p class="endpoint-desc">
+            Curated high-res wallpapers from Wallhaven. Filter by query, category, purity,
+            sorting. Returns full image metadata + multiple CDN sizes.
+          </p>
+          <div class="endpoint-params">
+            <span class="param"><strong>q</strong>=string</span>
+            <span class="param"><strong>page</strong>=int</span>
+            <span class="param"><strong>limit</strong>=int</span>
+            <span class="param"><strong>sorting</strong>=string</span>
+            <span class="param"><strong>categories</strong>=int</span>
+          </div>
         </div>
-        <div class="ep-path">/api/wallhaven</div>
-        <p class="ep-desc">Full-text search across wallhaven.cc — the largest free wallpaper archive. Returns thumbs + CDN URLs + proxy links.</p>
-        <div class="ep-params">
-          <span class="param"><strong>q</strong> search</span>
-          <span class="param"><strong>limit</strong> 1-64</span>
-          <span class="param"><strong>page</strong> 1..n</span>
-          <span class="param"><strong>purity</strong> 100</span>
-          <span class="param"><strong>sort</strong> relevance|date|views</span>
-          <span class="param"><strong>atleast</strong> 1920x1080</span>
-          <span class="param"><strong>format</strong> urls</span>
+
+        <div class="endpoint">
+          <div class="endpoint-head">
+            <span class="endpoint-name">/api/wallpaperaccess</span>
+            <span class="endpoint-tag">WallpaperAccess</span>
+          </div>
+          <p class="endpoint-desc">
+            Browse tagged wallpaper collections. Categories, popular tags, full-size
+            images via proxy. Great for themed galleries.
+          </p>
+          <div class="endpoint-params">
+            <span class="param"><strong>tag</strong>=string</span>
+            <span class="param"><strong>category</strong>=string</span>
+            <span class="param"><strong>page</strong>=int</span>
+            <span class="param"><strong>limit</strong>=int</span>
+          </div>
         </div>
-        <div class="ep-example">
-          <code>/api/wallhaven?q=anime&limit=3&format=urls</code>
-          <button class="copy-btn" data-copy="/api/wallhaven?q=anime&limit=3&format=urls">Copy</button>
+
+        <div class="endpoint">
+          <div class="endpoint-head">
+            <span class="endpoint-name">/api/workshop</span>
+            <span class="endpoint-tag">Steam Workshop</span>
+          </div>
+          <p class="endpoint-desc">
+            Wallpaper Engine Workshop items — animated and static wallpapers from
+            Steam's creator community. Includes preview URLs and item metadata.
+          </p>
+          <div class="endpoint-params">
+            <span class="param"><strong>query</strong>=string</span>
+            <span class="param"><strong>appid</strong>=int</span>
+            <span class="param"><strong>page</strong>=int</span>
+            <span class="param"><strong>limit</strong>=int</span>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-head">
+            <span class="endpoint-name">/api/dl</span>
+            <span class="endpoint-tag">Proxy</span>
+          </div>
+          <p class="endpoint-desc">
+            Browser-direct download proxy. Pass any image URL — server fetches
+            and streams bytes back so the browser saves the file directly.
+          </p>
+          <div class="endpoint-params">
+            <span class="param"><strong>url</strong>=string</span>
+          </div>
         </div>
       </div>
-
-      <!-- /api/dl -->
-      <div class="ep-card stagger-card">
-        <div class="ep-header">
-          <div class="ep-icon"><i class="fa-solid fa-download"></i></div>
-          <span class="ep-method">GET</span>
-        </div>
-        <div class="ep-path">/api/dl</div>
-        <p class="ep-desc">Unified direct-download endpoint. Auto-detects PNG / JPG / WebP, sets correct Referer, streams the binary back.</p>
-        <div class="ep-params">
-          <span class="param"><strong>source</strong> wallhaven|wallpaperaccess</span>
-          <span class="param"><strong>id</strong> wallpaper id</span>
-          <span class="param"><strong>url</strong> passthrough</span>
-        </div>
-        <div class="ep-example">
-          <code>/api/dl?source=wallhaven&id=j37zv5</code>
-          <button class="copy-btn" data-copy="/api/dl?source=wallhaven&id=j37zv5">Copy</button>
-        </div>
-      </div>
-
-      <!-- /api/workshop -->
-      <div class="ep-card stagger-card">
-        <div class="ep-header">
-          <div class="ep-icon"><i class="fa-brands fa-steam"></i></div>
-          <span class="ep-method">GET</span>
-        </div>
-        <div class="ep-path">/api/workshop</div>
-        <p class="ep-desc">Browse Steam Workshop for Wallpaper Engine (appid 431960). Real titles, authors, preview URLs. Binary downloads redirect to source — Steam requires a subscription.</p>
-        <div class="ep-params">
-          <span class="param"><strong>q</strong> text filter</span>
-          <span class="param"><strong>sort</strong> trend|newest|rating|popular</span>
-          <span class="param"><strong>page</strong></span>
-          <span class="param"><strong>limit</strong></span>
-        </div>
-        <div class="ep-example">
-          <code>/api/workshop?sort=trend&limit=10</code>
-          <button class="copy-btn" data-copy="/api/workshop?sort=trend&limit=10">Copy</button>
-        </div>
-      </div>
-
-      <!-- /api/wallpaperaccess -->
-      <div class="ep-card stagger-card">
-        <div class="ep-header">
-          <div class="ep-icon"><i class="fa-solid fa-image"></i></div>
-          <span class="ep-method">GET</span>
-        </div>
-        <div class="ep-path">/api/wallpaperaccess</div>
-        <p class="ep-desc">Direct image download by numeric ID. Search is gated by Cloudflare on wallpaperaccess.com — grab IDs from their site, fetch here.</p>
-        <div class="ep-params">
-          <span class="param"><strong>id</strong> numeric id (required)</span>
-        </div>
-        <div class="ep-example">
-          <code>/api/wallpaperaccess?id=12578</code>
-          <button class="copy-btn" data-copy="/api/wallpaperaccess?id=12578">Copy</button>
-        </div>
-      </div>
-
     </div>
   </section>
 
   <!-- EXAMPLES -->
   <section id="examples">
-    <div class="section-head fade-in">
-      <div class="kicker">// response shape</div>
-      <h2>What you get back.</h2>
-      <p>Every endpoint returns clean JSON with deduped media, totals, and a <code style="color:var(--accent-3)">cached</code> flag. No scraping the source HTML on your end.</p>
-    </div>
+    <div class="container">
+      <div class="section-head">
+        <div class="section-eyebrow">Examples</div>
+        <h2 class="section-title">Request · Response · Code</h2>
+        <p class="section-sub">Copy-paste ready. No SDKs, no wrappers, no auth tokens.</p>
+      </div>
 
-    <div class="demo-row">
-      <div class="demo-col fade-in">
-        <h3>Request</h3>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="request">Request</button>
+        <button class="tab" data-tab="response">Response</button>
+        <button class="tab" data-tab="js">JavaScript</button>
+        <button class="tab" data-tab="python">Python</button>
+      </div>
+
+      <div class="tab-panel active" data-panel="request">
         <div class="code-block">
-<span class="tok-cm"># Curl — flat URL array</span>
-<span class="tok-key">curl</span> <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/wallhaven?q=anime&limit=3&format=urls"</span>
+          <button class="copy-btn" data-copy-target="req-code">Copy</button>
+          <pre id="req-code"><span class="syntax-com"># Fetch 6 nature wallpapers, sorted by favorites</span>
+<span class="syntax-key">GET</span> <span class="syntax-str">https://zade-wallpaper-api.vercel.app/api/wallhaven?q=nature&limit=6&sorting=favorites</span>
+
+<span class="syntax-com"># Browse anime-tagged wallpapers</span>
+<span class="syntax-key">GET</span> <span class="syntax-str">https://zade-wallpaper-api.vercel.app/api/wallpaperaccess?tag=anime&limit=8</span>
+
+<span class="syntax-com"># Search Steam Workshop for live wallpapers</span>
+<span class="syntax-key">GET</span> <span class="syntax-str">https://zade-wallpaper-api.vercel.app/api/workshop?query=scenery&limit=5</span>
+
+<span class="syntax-com"># Direct-download proxy</span>
+<span class="syntax-key">GET</span> <span class="syntax-str">https://zade-wallpaper-api.vercel.app/api/dl?url=&lt;image_url&gt;</span></pre>
         </div>
       </div>
-      <div class="demo-col fade-in">
-        <h3>Response</h3>
+
+      <div class="tab-panel" data-panel="response">
         <div class="code-block">
-<span class="tok-pun">[</span>
-  <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/dl?source=wallhaven&id=j37zv5"</span><span class="tok-pun">,</span>
-  <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/dl?source=wallhaven&id=n657lq"</span><span class="tok-pun">,</span>
-  <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/dl?source=wallhaven&id=w81wwp"</span>
-<span class="tok-pun">]</span>
+          <button class="copy-btn" data-copy-target="res-code">Copy</button>
+          <pre id="res-code"><span class="syntax-pun">{</span>
+  <span class="syntax-key">"success"</span><span class="syntax-pun">:</span> <span class="syntax-num">true</span><span class="syntax-pun">,</span>
+  <span class="syntax-key">"source"</span><span class="syntax-pun">:</span> <span class="syntax-str">"wallhaven"</span><span class="syntax-pun">,</span>
+  <span class="syntax-key">"query"</span><span class="syntax-pun">:</span> <span class="syntax-str">"nature"</span><span class="syntax-pun">,</span>
+  <span class="syntax-key">"total_records"</span><span class="syntax-pun">:</span> <span class="syntax-num">6</span><span class="syntax-pun">,</span>
+  <span class="syntax-key">"cached"</span><span class="syntax-pun">:</span> <span class="syntax-num">false</span><span class="syntax-pun">,</span>
+  <span class="syntax-key">"owner"</span><span class="syntax-pun">:</span> <span class="syntax-str">"@zade4everbot"</span><span class="syntax-pun">,</span>
+  <span class="syntax-key">"results"</span><span class="syntax-pun">:</span> <span class="syntax-pun">[</span>
+    <span class="syntax-pun">{</span>
+      <span class="syntax-key">"id"</span><span class="syntax-pun">:</span> <span class="syntax-str">"8xq1ko"</span><span class="syntax-pun">,</span>
+      <span class="syntax-key">"type"</span><span class="syntax-pun">:</span> <span class="syntax-str">"image"</span><span class="syntax-pun">,</span>
+      <span class="syntax-key">"filename"</span><span class="syntax-pun">:</span> <span class="syntax-str">"mountain_sunset.jpg"</span><span class="syntax-pun">,</span>
+      <span class="syntax-key">"width"</span><span class="syntax-pun">:</span> <span class="syntax-num">3840</span><span class="syntax-pun">,</span>
+      <span class="syntax-key">"height"</span><span class="syntax-pun">:</span> <span class="syntax-num">2160</span><span class="syntax-pun">,</span>
+      <span class="syntax-key">"cdn_url"</span><span class="syntax-pun">:</span> <span class="syntax-str">"https://w.wallhaven.cc/full/8x/wallhaven-8xq1ko.jpg"</span><span class="syntax-pun">,</span>
+      <span class="syntax-key">"thumb_url"</span><span class="syntax-pun">:</span> <span class="syntax-str">"https://w.wallhaven.cc/preview/8x/wallhaven-8xq1ko.jpg"</span><span class="syntax-pun">,</span>
+      <span class="syntax-key">"source_url"</span><span class="syntax-pun">:</span> <span class="syntax-str">"https://wallhaven.cc/w/8xq1ko"</span><span class="syntax-pun">,</span>
+      <span class="syntax-key">"tags"</span><span class="syntax-pun">:</span> <span class="syntax-pun">[</span><span class="syntax-str">"nature"</span><span class="syntax-pun">,</span> <span class="syntax-str">"mountain"</span><span class="syntax-pun">,</span> <span class="syntax-str">"sunset"</span><span class="syntax-pun">]</span>
+    <span class="syntax-pun">}</span>
+  <span class="syntax-pun">]</span>
+<span class="syntax-pun">}</span></pre>
         </div>
       </div>
-    </div>
 
-    <div class="demo-row" style="margin-top: 24px;">
-      <div class="demo-col fade-in">
-        <h3>Full metadata request</h3>
+      <div class="tab-panel" data-panel="js">
         <div class="code-block">
-<span class="tok-cm"># Default mode — full result objects</span>
-<span class="tok-key">curl</span> <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/wallhaven?q=anime&limit=1"</span>
+          <button class="copy-btn" data-copy-target="js-code">Copy</button>
+          <pre id="js-code"><span class="syntax-com">// Fetch 6 nature wallpapers</span>
+<span class="syntax-key">const</span> res <span class="syntax-pun">=</span> <span class="syntax-key">await</span> <span class="syntax-str">fetch</span><span class="syntax-pun">(</span>
+  <span class="syntax-str">'https://zade-wallpaper-api.vercel.app/api/wallhaven?q=nature&limit=6'</span>
+<span class="syntax-pun">);</span>
+<span class="syntax-key">const</span> data <span class="syntax-pun">=</span> <span class="syntax-key">await</span> res<span class="syntax-pun">.</span><span class="syntax-str">json</span><span class="syntax-pun">();</span>
+
+<span class="syntax-com">// data.results[0].cdn_url — direct image link</span>
+<span class="syntax-com">// data.results[0].thumb_url — preview thumbnail</span>
+
+data<span class="syntax-pun">.</span>results<span class="syntax-pun">.</span><span class="syntax-str">forEach</span><span class="syntax-pun">(</span>wp <span class="syntax-pun">=&gt;</span> <span class="syntax-pun">{</span>
+  console<span class="syntax-pun">.</span><span class="syntax-str">log</span><span class="syntax-pun">(</span><span class="syntax-str">`${wp.filename} — ${wp.width}×${wp.height}`</span><span class="syntax-pun">);</span>
+<span class="syntax-pun">});</span>
+
+<span class="syntax-com">// Direct browser download via /api/dl proxy:</span>
+window<span class="syntax-pun">.</span>location<span class="syntax-pun">.</span>href <span class="syntax-pun">=</span>
+  <span class="syntax-str">`/api/dl?url=${encodeURIComponent(data.results[0].cdn_url)}`</span><span class="syntax-pun">;</span></pre>
         </div>
       </div>
-      <div class="demo-col fade-in">
-        <h3>Full metadata response</h3>
-        <div class="code-block" style="max-height: 360px; overflow-y: auto;">
-<span class="tok-pun">{</span>
-  <span class="tok-key">"ok"</span><span class="tok-pun">:</span> <span class="tok-bool">true</span><span class="tok-pun">,</span>
-  <span class="tok-key">"owner"</span><span class="tok-pun">:</span> <span class="tok-str">"@zade4everbot"</span><span class="tok-pun">,</span>
-  <span class="tok-key">"source"</span><span class="tok-pun">:</span> <span class="tok-str">"wallhaven"</span><span class="tok-pun">,</span>
-  <span class="tok-key">"query"</span><span class="tok-pun">:</span> <span class="tok-pun">{</span> <span class="tok-key">"q"</span><span class="tok-pun">:</span> <span class="tok-str">"anime"</span><span class="tok-pun">,</span> <span class="tok-key">"page"</span><span class="tok-pun">:</span> <span class="tok-num">1</span> <span class="tok-pun">}</span><span class="tok-pun">,</span>
-  <span class="tok-key">"total_results"</span><span class="tok-pun">:</span> <span class="tok-num">24</span><span class="tok-pun">,</span>
-  <span class="tok-key">"returned"</span><span class="tok-pun">:</span> <span class="tok-num">1</span><span class="tok-pun">,</span>
-  <span class="tok-key">"cached"</span><span class="tok-pun">:</span> <span class="tok-bool">false</span><span class="tok-pun">,</span>
-  <span class="tok-key">"results"</span><span class="tok-pun">:</span> <span class="tok-pun">[{</span>
-    <span class="tok-key">"id"</span><span class="tok-pun">:</span> <span class="tok-str">"j37zv5"</span><span class="tok-pun">,</span>
-    <span class="tok-key">"source"</span><span class="tok-pun">:</span> <span class="tok-str">"wallhaven"</span><span class="tok-pun">,</span>
-    <span class="tok-key">"title"</span><span class="tok-pun">:</span> <span class="tok-str">"wallhaven-j37zv5"</span><span class="tok-pun">,</span>
-    <span class="tok-key">"thumb"</span><span class="tok-pun">:</span> <span class="tok-str">"https://th.wallhaven.cc/small/j3/j37zv5.jpg"</span><span class="tok-pun">,</span>
-    <span class="tok-key">"full_url"</span><span class="tok-pun">:</span> <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/dl?source=wallhaven&id=j37zv5"</span><span class="tok-pun">,</span>
-    <span class="tok-key">"cdn_url_png"</span><span class="tok-pun">:</span> <span class="tok-str">"https://w.wallhaven.cc/full/j3/wallhaven-j37zv5.png"</span><span class="tok-pun">,</span>
-    <span class="tok-key">"cdn_url_jpg"</span><span class="tok-pun">:</span> <span class="tok-str">"https://w.wallhaven.cc/full/j3/wallhaven-j37zv5.jpg"</span><span class="tok-pun">,</span>
-    <span class="tok-key">"page_url"</span><span class="tok-pun">:</span> <span class="tok-str">"https://wallhaven.cc/w/j37zv5"</span>
-  <span class="tok-pun">}]</span>
-<span class="tok-pun">}</span>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- JS / USAGE -->
-  <section id="usage">
-    <div class="section-head fade-in">
-      <div class="kicker">// drop-in code</div>
-      <h2>Use it in 3 lines.</h2>
-      <p>No SDK. No npm install. Just <code style="color:var(--accent-3)">fetch</code>.</p>
-    </div>
-
-    <div class="demo-row">
-      <div class="demo-col fade-in">
-        <h3>JavaScript</h3>
+      <div class="tab-panel" data-panel="python">
         <div class="code-block">
-<span class="tok-cm">// Fetch 3 anime wallpapers as URLs</span>
-<span class="tok-key">const</span> urls = <span class="tok-key">await</span> <span class="tok-key">await</span> <span class="tok-key">fetch</span><span class="tok-pun">(</span>
-  <span class="tok-str">'/api/wallhaven?q=anime&limit=3&format=urls'</span>
-<span class="tok-pun">).</span><span class="tok-key">then</span><span class="tok-pun">(</span><span class="tok-key">r</span> =&gt; <span class="tok-key">r</span><span class="tok-pun">.</span><span class="tok-key">json</span><span class="tok-pun">())</span><span class="tok-pun">;</span>
+          <button class="copy-btn" data-copy-target="py-code">Copy</button>
+          <pre id="py-code"><span class="syntax-com"># pip install requests</span>
+<span class="syntax-key">import</span> requests
 
-<span class="tok-cm">// Render in &lt;img&gt;</span>
-urls<span class="tok-pun">.</span><span class="tok-key">forEach</span><span class="tok-pun">(</span><span class="tok-key">u</span> =&gt; <span class="tok-pun">{</span>
-  <span class="tok-key">document</span><span class="tok-pun">.</span><span class="tok-key">body</span><span class="tok-pun">.</span><span class="tok-key">innerHTML</span> += <span class="tok-str">`&lt;img src="$</span><span class="tok-pun">{</span><span class="tok-key">u</span><span class="tok-pun">}</span><span class="tok-str">"&gt;`</span><span class="tok-pun">;</span>
-<span class="tok-pun">})</span><span class="tok-pun">;</span>
-        </div>
-      </div>
-      <div class="demo-col fade-in">
-        <h3>Python</h3>
-        <div class="code-block">
-<span class="tok-key">import</span> requests
+r <span class="syntax-pun">=</span> requests<span class="syntax-pun">.</span><span class="syntax-str">get</span><span class="syntax-pun">(</span>
+    <span class="syntax-str">"https://zade-wallpaper-api.vercel.app/api/wallhaven"</span><span class="syntax-pun">,</span>
+    params<span class="syntax-pun">=</span><span class="syntax-pun">{</span><span class="syntax-str">"q"</span><span class="syntax-pun">:</span> <span class="syntax-str">"nature"</span><span class="syntax-pun">,</span> <span class="syntax-str">"limit"</span><span class="syntax-pun">:</span> <span class="syntax-num">6</span><span class="syntax-pun">}</span>
+<span class="syntax-pun">)</span>
+data <span class="syntax-pun">=</span> r<span class="syntax-pun">.</span><span class="syntax-str">json</span><span class="syntax-pun">()</span>
 
-<span class="tok-cm"># Get a flat URL list</span>
-urls = requests<span class="tok-pun">.</span>get<span class="tok-pun">(</span>
-    <span class="tok-str">"https://zade-wallpaper-api.vercel.app/api/wallhaven"</span><span class="tok-pun">,</span>
-    params=<span class="tok-pun">{</span><span class="tok-str">"q"</span><span class="tok-pun">:</span> <span class="tok-str">"anime"</span><span class="tok-pun">,</span> <span class="tok-str">"limit"</span><span class="tok-pun">:</span> <span class="tok-num">3</span><span class="tok-pun">,</span> <span class="tok-str">"format"</span><span class="tok-pun">:</span> <span class="tok-str">"urls"</span><span class="tok-pun">}</span>
-<span class="tok-pun">).</span>json<span class="tok-pun">()</span>
+<span class="syntax-key">for</span> wp <span class="syntax-key">in</span> data[<span class="syntax-str">"results"</span>]<span class="syntax-pun">:</span>
+    <span class="syntax-str">print</span><span class="syntax-pun">(</span><span class="syntax-str">f"{wp['filename']} — {wp['width']}×{wp['height']}"</span><span class="syntax-pun">)</span>
 
-<span class="tok-key">for</span> url <span class="tok-key">in</span> urls<span class="tok-pun">:</span>
-    <span class="tok-key">print</span><span class="tok-pun">(</span>url<span class="tok-pun">)</span>
+<span class="syntax-com"># Direct browser download via /api/dl proxy:</span>
+<span class="syntax-key">import</span> urllib.parse
+download_url <span class="syntax-pun">=</span> <span class="syntax-str">f"/api/dl?url={urllib.parse.quote(data['results'][0]['cdn_url'])}"</span></pre>
         </div>
       </div>
     </div>
@@ -912,133 +968,130 @@ urls = requests<span class="tok-pun">.</span>get<span class="tok-pun">(</span>
 
   <!-- FOOTER -->
   <footer>
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <a href="/" class="logo">
-          <div class="logo-mark"><i class="fa-solid fa-image"></i></div>
-          zade-wallpaper-api
-        </a>
-        <p>Built by Zora AI for @zade4everbot. Deployed on Vercel edge. Sources: Wallhaven, Steam Workshop, WallpaperAccess.</p>
+    <div class="container footer-inner">
+      <div class="footer-text">
+        © 2026 zade-wallpaper-api · Built by <a href="https://t.me/zade4everbot" style="color:var(--tertiary);">@zade4everbot</a> · Powered by Vercel
       </div>
-      <div class="footer-col">
-        <h4>API</h4>
-        <a href="/api/wallhaven">/api/wallhaven</a>
-        <a href="/api/dl">/api/dl</a>
-        <a href="/api/workshop">/api/workshop</a>
-        <a href="/api/wallpaperaccess">/api/wallpaperaccess</a>
-        <a href="/api">/api (index)</a>
+      <div class="footer-links">
+        <a href="https://github.com/zedxlab/zade-wallpaper-api" target="_blank" rel="noopener" class="nav-link">GitHub</a>
+        <a href="https://t.me/zade4everbot" target="_blank" rel="noopener" class="nav-link">Telegram</a>
+        <a href="/api" target="_blank" rel="noopener" class="nav-link">API root</a>
       </div>
-      <div class="footer-col">
-        <h4>Project</h4>
-        <a href="https://github.com/zedxlab/zade-wallpaper-api" target="_blank" rel="noopener">GitHub repo</a>
-        <a href="https://vercel.com" target="_blank" rel="noopener">Powered by Vercel</a>
-        <a href="#endpoints">Documentation</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 zade-wallpaper-api — Owner @zade4everbot</span>
-      <span>Built by Zora AI by Zade</span>
     </div>
   </footer>
 
-  <!-- GSAP -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script>
-    gsap.registerPlugin(ScrollTrigger);
-
-    // HERO entrance
-    gsap.to('.hero .fade-in', {
-      opacity: 1,
-      y: 0,
-      duration: 1,
-      stagger: 0.15,
-      ease: 'power3.out',
-      delay: 0.1
-    });
-
-    // SECTION fade-ins on scroll
-    gsap.utils.toArray('section .fade-in').forEach((el) => {
-      gsap.to(el, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 85%' }
-      });
-    });
-
-    // Endpoint cards stagger
-    gsap.to('.stagger-card', {
-      opacity: 1,
-      y: 0,
-      duration: 0.7,
-      stagger: 0.1,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: '.endpoints', start: 'top 75%' }
-    });
-
-    // STAT counter animation
-    document.querySelectorAll('.stat-val[data-target]').forEach(el => {
-      const target = parseInt(el.dataset.target, 10);
-      const suffix = el.dataset.suffix || '';
-      const obj = { v: 0 };
-      gsap.to(obj, {
-        v: target,
-        duration: 1.6,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: el, start: 'top 90%' },
-        onUpdate: () => { el.textContent = Math.round(obj.v) + suffix; }
-      });
-    });
-
-    // LIVE GALLERY
-    const gallery = document.getElementById('gallery');
-    const searchQ = document.getElementById('searchQ');
-    const searchBtn = document.getElementById('searchBtn');
-
-    async function loadGallery(q) {
-      // Skeleton
-      gallery.innerHTML = Array(8).fill(0).map(() => '<div class="gallery-skeleton"></div>').join('');
+    // Live gallery fetch
+    (async () => {
+      const gallery = document.getElementById('gallery');
       try {
-        const r = await fetch(`/api/wallhaven?q=${encodeURIComponent(q)}&limit=8`);
-        const data = await r.json();
-        const items = (data.results || []).map(item => `
-          <a href="${item.full_url}" target="_blank" rel="noopener" class="gallery-item">
-            <img src="${item.thumb}" alt="${item.title}" loading="lazy" />
-            <div class="overlay">${item.id}</div>
-          </a>
-        `).join('');
-        gallery.innerHTML = items;
+        const res = await fetch('/api/wallhaven?q=nature&limit=8');
+        const data = await res.json();
+        const items = (data.results || []).slice(0, 8);
+        if (!items.length) {
+          gallery.innerHTML = '<div class="gallery-loader">No wallpapers returned.</div>';
+          return;
+        }
+        gallery.innerHTML = '';
+        items.forEach((wp, i) => {
+          const div = document.createElement('div');
+          div.className = 'gallery-item' + (i === 0 ? ' tall' : i === 3 ? ' wide' : '');
+          const img = document.createElement('img');
+          img.loading = 'lazy';
+          img.src = wp.thumb_url || wp.cdn_url;
+          img.alt = wp.filename || 'wallpaper';
+          img.onerror = () => { img.src = wp.cdn_url; };
+          div.appendChild(img);
+          div.onclick = () => window.open(wp.cdn_url, '_blank');
+          gallery.appendChild(div);
+        });
       } catch (e) {
-        gallery.innerHTML = '<div style="color:var(--text-dim);padding:24px;">Failed to load. Try again.</div>';
+        gallery.innerHTML = '<div class="gallery-loader">Failed to load — refresh to retry.</div>';
       }
-    }
+    })();
 
-    searchBtn.addEventListener('click', () => loadGallery(searchQ.value || 'anime'));
-    searchQ.addEventListener('keydown', e => { if (e.key === 'Enter') loadGallery(searchQ.value || 'anime'); });
-    loadGallery('anime sunset');
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+        document.querySelectorAll('.tab-panel').forEach(p => {
+          p.classList.toggle('active', p.dataset.panel === target);
+        });
+      });
+    });
 
-    // COPY buttons
+    // Copy buttons
     document.querySelectorAll('.copy-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
-        const text = btn.dataset.copy;
+        const target = document.getElementById(btn.dataset.copyTarget);
         try {
-          await navigator.clipboard.writeText(text);
-        } catch {
-          const ta = document.createElement('textarea');
-          ta.value = text;
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          ta.remove();
-        }
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+          await navigator.clipboard.writeText(target.innerText);
+          btn.classList.add('copied');
+          btn.textContent = 'Copied';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.textContent = 'Copy';
+          }, 1500);
+        } catch (e) {}
       });
     });
+
+    // Animate stat counters on scroll
+    const animateCount = (el) => {
+      const target = parseInt(el.dataset.count, 10);
+      if (isNaN(target)) return;
+      let current = 0;
+      const step = Math.max(1, Math.ceil(target / 30));
+      const tick = () => {
+        current = Math.min(target, current + step);
+        el.textContent = current;
+        if (current < target) requestAnimationFrame(tick);
+      };
+      tick();
+    };
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCount(entry.target);
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.4 });
+
+    document.querySelectorAll('[data-count]').forEach(el => io.observe(el));
+
+    // Subtle entrance fade-in
+    const fadeObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          fadeObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('section').forEach(s => {
+      s.style.opacity = '0';
+      s.style.transform = 'translateY(20px)';
+      s.style.transition = 'opacity 600ms cubic-bezier(0.4,0,0.2,1), transform 600ms cubic-bezier(0.4,0,0.2,1)';
+      fadeObserver.observe(s);
+    });
+
+    // Hero badge subtle pulse
+    const dot = document.querySelector('.badge-dot');
+    if (dot) {
+      let t = 0;
+      const pulse = () => {
+        t += 0.05;
+        const a = 0.6 + Math.sin(t) * 0.4;
+        dot.style.boxShadow = `0 0 ${6 + a * 6}px rgba(139, 92, 246, ${a})`;
+        requestAnimationFrame(pulse);
+      };
+      pulse();
+    }
   </script>
 </body>
 </html>
