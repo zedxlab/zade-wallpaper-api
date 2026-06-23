@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/api/index" },
+    { "source": "/", "destination": "/public/index.html" },
     { "source": "/api", "destination": "/api/index" },
     { "source": "/api/wallhaven", "destination": "/api/wallhaven" },
     { "source": "/api/wallpaperaccess", "destination": "/api/wallpaperaccess" },

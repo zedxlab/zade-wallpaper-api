@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>zade-wallpaper-api — Wallpapers, reimagined</title>
+<meta name="description" content="Free wallpaper API aggregating Wallhaven, Steam Workshop, and WallpaperAccess. Search, browse, download — all under one URL." />
+<meta name="theme-color" content="#0a0a14" />
+<meta property="og:title" content="zade-wallpaper-api" />
+<meta property="og:description" content="Free wallpaper API. 4 endpoints. Zero auth." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://zade-wallpaper-api.vercel.app" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+/* ============================================================
+   zade-wallpaper-api — Showcase
+   Theme: Dark Glassmorphism + GSAP
+   Built by Zora AI by Zade
+   ============================================================ */
+
+:root {
+  /* Color tokens — semantic, dark-mode first */
+  --bg-base: #07070d;
+  --bg-elev-1: rgba(255, 255, 255, 0.03);
+  --bg-elev-2: rgba(255, 255, 255, 0.06);
+  --bg-glass: rgba(20, 20, 32, 0.55);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass-hover: rgba(255, 255, 255, 0.18);
+  --text-primary: #f4f4f8;
+  --text-secondary: #a0a0b4;
+  --text-muted: #6b6b80;
+  --accent-cyan: #00e5ff;
+  --accent-magenta: #ff3d8a;
+  --accent-violet: #9b6dff;
+  --accent-gradient: linear-gradient(135deg, #00e5ff 0%, #9b6dff 50%, #ff3d8a 100%);
+  --accent-gradient-soft: linear-gradient(135deg, rgba(0, 229, 255, 0.15) 0%, rgba(155, 109, 255, 0.15) 50%, rgba(255, 61, 138, 0.15) 100%);
+  --success: #34d399;
+  --error: #f87171;
+  --code-bg: rgba(0, 0, 0, 0.4);
+  --shadow-glow-cyan: 0 0 40px rgba(0, 229, 255, 0.3);
+  --shadow-glow-magenta: 0 0 40px rgba(255, 61, 138, 0.3);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Typography scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.5rem;
+  --text-6xl: 5rem;
+
+  /* Spacing scale — 4/8 rhythm */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* Animation tokens */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+
+  /* Layout */
+  --container-max: 1280px;
+  --nav-height: 72px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-base);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(155, 109, 255, 0.18), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0, 229, 255, 0.15), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(255, 61, 138, 0.12), transparent 60%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code, pre, .mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  background: rgba(7, 7, 13, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.nav-logo {
+  width: 32px; height: 32px;
+  background: var(--accent-gradient);
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--bg-base);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  transition: all var(--duration-base) var(--ease-out);
+}
+
+.nav-links a:hover {
+  color: var(--text-primary);
+  background: var(--bg-elev-1);
+}
+
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent-gradient);
+  color: var(--bg-base) !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-full) !important;
+  transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
+}
+
+.nav-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow-cyan);
+  background: var(--accent-gradient) !important;
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-cta { padding: var(--space-2) var(--space-3); }
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+section { position: relative; padding: var(--space-24) 0; }
+section:first-of-type { padding-top: calc(var(--nav-height) + var(--space-16)); }
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: var(--space-4);
+}
+
+.section-label::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--accent-cyan);
+}
+
+.section-title {
+  font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: var(--space-4);
+}
+
+.section-subtitle {
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin-bottom: var(--space-12);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  position: relative;
+  padding-top: calc(var(--nav-height) + var(--space-24));
+  padding-bottom: var(--space-24);
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero-orb {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-orb-1 { top: -200px; left: -100px; background: var(--accent-violet); }
+.hero-orb-2 { top: -100px; right: -100px; background: var(--accent-cyan); }
+.hero-orb-3 { bottom: -300px; left: 50%; transform: translateX(-50%); background: var(--accent-magenta); opacity: 0.3; }
+
+.hero-inner { position: relative; z-index: 1; }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+.hero-badge-dot {
+  width: 8px; height: 8px;
+  background: var(--success);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--success);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+.hero-title {
+  font-size: clamp(var(--text-4xl), 8vw, var(--text-6xl));
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: var(--space-6);
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  font-size: clamp(var(--text-lg), 2vw, var(--text-xl));
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin: 0 auto var(--space-12);
+  line-height: 1.5;
+}
+
+.hero-cta-group {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-16);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6);
+  font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  border: none;
+  transition: all var(--duration-base) var(--ease-out);
+  min-height: 48px;
+}
+
+.btn-primary {
+  background: var(--accent-gradient);
+  color: var(--bg-base);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 60px rgba(0, 229, 255, 0.5);
+}
+
+.btn-secondary {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-elev-2);
+  border-color: var(--border-glass-hover);
+  transform: translateY(-2px);
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-6);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.hero-stat {
+  padding: var(--space-6);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+}
+
+.hero-stat-value {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: var(--space-1);
+}
+
+.hero-stat-label {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+
+/* ============================================================
+   LIVE PREVIEW — wallpaper grid
+   ============================================================ */
+.preview {
+  position: relative;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-12);
+}
+
+.preview-card {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-elev-1);
+  border: 1px solid var(--border-glass);
+  cursor: pointer;
+  transition: all var(--duration-slow) var(--ease-out);
+  transform-style: preserve-3d;
+}
+
+.preview-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--accent-cyan);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.preview-card img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.preview-card:hover img { transform: scale(1.08); }
+
+.preview-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.preview-card:hover .preview-card-overlay { opacity: 1; }
+
+.preview-card-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-sm);
+  color: var(--accent-cyan);
+  font-weight: 500;
+}
+
+.preview-card-source {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ============================================================
+   ENDPOINTS SECTION
+   ============================================================ */
+.endpoints-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  margin-top: var(--space-12);
+}
+
+.endpoint-card {
+  position: relative;
+  padding: var(--space-8);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  transition: all var(--duration-base) var(--ease-out);
+  overflow: hidden;
+}
+
+.endpoint-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent-gradient-soft);
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+  pointer-events: none;
+}
+
+.endpoint-card:hover {
+  border-color: var(--border-glass-hover);
+  transform: translateY(-2px);
+}
+
+.endpoint-card:hover::before { opacity: 1; }
+
+.endpoint-header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.endpoint-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.endpoint-method {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--success);
+  color: var(--bg-base);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.endpoint-path {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.endpoint-source-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px 10px;
+  background: var(--bg-elev-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.endpoint-description {
+  position: relative;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-6);
+  font-size: var(--text-base);
+}
+
+.endpoint-params {
+  position: relative;
+  margin-bottom: var(--space-6);
+}
+
+.endpoint-params-title {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-3);
+}
+
+.params-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.param-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px 12px;
+  background: rgba(0, 229, 255, 0.08);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  border-radius: var(--radius-full);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-xs);
+  color: var(--accent-cyan);
+}
+
+.endpoint-example {
+  position: relative;
+  background: var(--code-bg);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  overflow-x: auto;
+}
+
+.endpoint-example-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.endpoint-example-label {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px 10px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-family: inherit;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  min-height: 28px;
+}
+
+.copy-btn:hover {
+  background: var(--accent-cyan);
+  color: var(--bg-base);
+  border-color: var(--accent-cyan);
+}
+
+.copy-btn.copied {
+  background: var(--success);
+  color: var(--bg-base);
+  border-color: var(--success);
+}
+
+.endpoint-example code {
+  display: block;
+  color: var(--accent-cyan);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.endpoint-example code .comment { color: var(--text-muted); }
+.endpoint-example code .string { color: var(--accent-magenta); }
+.endpoint-example code .keyword { color: var(--accent-violet); }
+
+/* ============================================================
+   PLAYGROUND — try it live
+   ============================================================ */
+.playground {
+  position: relative;
+}
+
+.playground-box {
+  margin-top: var(--space-12);
+  padding: var(--space-8);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+}
+
+.playground-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.control-group { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.control-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.control-input,
+.control-select {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-elev-1);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-sm);
+  transition: all var(--duration-fast) var(--ease-out);
+  min-height: 44px;
+}
+
+.control-input:focus,
+.control-select:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  background: var(--bg-elev-2);
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15);
+}
+
+.btn-run {
+  background: var(--accent-gradient);
+  color: var(--bg-base);
+  font-weight: 600;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--duration-base) var(--ease-out);
+  min-height: 44px;
+  align-self: end;
+}
+
+.btn-run:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.btn-run:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.playground-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.result-card {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-elev-1);
+  border: 1px solid var(--border-glass);
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.result-card img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.result-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent 60%);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.result-card-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-xs);
+  color: var(--accent-cyan);
+  margin-bottom: var(--space-1);
+}
+
+.result-card-link {
+  font-size: var(--text-xs);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.result-card-link:hover { color: var(--accent-cyan); }
+
+.playground-loading {
+  text-align: center;
+  padding: var(--space-12);
+  color: var(--text-muted);
+}
+
+.playground-loading::after {
+  content: '';
+  display: inline-block;
+  width: 24px; height: 24px;
+  border: 2px solid var(--border-glass);
+  border-top-color: var(--accent-cyan);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: var(--space-3);
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   FEATURES GRID
+   ============================================================ */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-12);
+}
+
+.feature-card {
+  padding: var(--space-6);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  transition: all var(--duration-base) var(--ease-out);
+}
+
+.feature-card:hover {
+  border-color: var(--border-glass-hover);
+  transform: translateY(-2px);
+}
+
+.feature-icon {
+  width: 48px; height: 48px;
+  background: var(--accent-gradient-soft);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-4);
+  color: var(--accent-cyan);
+}
+
+.feature-icon svg { width: 24px; height: 24px; }
+
+.feature-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.feature-desc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  margin-top: var(--space-24);
+  padding: var(--space-12) 0;
+  border-top: 1px solid var(--border-glass);
+  text-align: center;
+}
+
+.footer-brand {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.footer-credit {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.footer-credit a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+
+.footer-credit a:hover { text-decoration: underline; }
+
+/* ============================================================
+   ANIMATIONS — initial states (GSAP will animate to final)
+   ============================================================ */
+.fade-up { opacity: 0; transform: translateY(30px); }
+.fade-in { opacity: 0; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  section { padding: var(--space-16) 0; }
+  .endpoint-card { padding: var(--space-6); }
+  .playground-box { padding: var(--space-6); }
+  .endpoint-path { font-size: var(--text-lg); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elev-2);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--accent-violet); }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav class="nav" role="navigation" aria-label="Main">
+  <a href="/" class="nav-brand">
+    <div class="nav-logo">Z</div>
+    <span>zade-wallpaper-api</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#endpoints">Endpoints</a></li>
+    <li><a href="#playground">Playground</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="https://github.com/zedxlab/zade-wallpaper-api" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="/api" class="nav-cta">API Docs →</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-orb hero-orb-3"></div>
+
+  <div class="container hero-inner">
+    <div class="hero-badge fade-up">
+      <span class="hero-badge-dot"></span>
+      <span>Live • 4 endpoints • Zero auth</span>
+    </div>
+
+    <h1 class="hero-title fade-up">Wallpapers, reimagined.</h1>
+    <p class="hero-subtitle fade-up">
+      One API. Three sources. Infinite walls.
+      Search <strong>Wallhaven</strong>, browse <strong>Steam Workshop</strong>,
+      download <strong>WallpaperAccess</strong> — all under one URL.
+    </p>
+
+    <div class="hero-cta-group fade-up">
+      <a href="#playground" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        Try it live
+      </a>
+      <a href="/api" class="btn btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+        View JSON
+      </a>
+    </div>
+
+    <div class="hero-stats fade-up">
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-counter="4">0</div>
+        <div class="hero-stat-label">Endpoints</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-counter="3">0</div>
+        <div class="hero-stat-label">Sources</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-counter="0" data-suffix="ms">0ms</div>
+        <div class="hero-stat-label">Auth Required</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">100%</div>
+        <div class="hero-stat-label">Free Forever</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LIVE PREVIEW
+     ============================================================ -->
+<section class="preview">
+  <div class="container">
+    <div class="section-label fade-up">Live preview</div>
+    <h2 class="section-title fade-up">See what's inside.</h2>
+    <p class="section-subtitle fade-up">Real wallpapers, fetched in real-time from the API. Click any to download.</p>
+
+    <div class="preview-grid" id="previewGrid">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ENDPOINTS
+     ============================================================ -->
+<section id="endpoints">
+  <div class="container">
+    <div class="section-label fade-up">API Reference</div>
+    <h2 class="section-title fade-up">Four endpoints.<br/>Zero complexity.</h2>
+    <p class="section-subtitle fade-up">
+      No API keys. No rate limits. No SDK.
+      Just hit the URL, get JSON (or image bytes).
+    </p>
+
+    <div class="endpoints-grid">
+
+      <!-- /api/wallhaven -->
+      <article class="endpoint-card fade-up">
+        <div class="endpoint-header">
+          <div class="endpoint-title-group">
+            <span class="endpoint-method">GET</span>
+            <span class="endpoint-path">/api/wallhaven</span>
+            <span class="endpoint-source-tag">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              wallhaven.cc
+            </span>
+          </div>
+        </div>
+        <p class="endpoint-description">
+          Full-text search across Wallhaven's free wallpaper library. Returns rich metadata, thumbnails, and direct CDN URLs. Supports purity filters, sort modes, and resolution minimums.
+        </p>
+        <div class="endpoint-params">
+          <div class="endpoint-params-title">Parameters</div>
+          <div class="params-list">
+            <span class="param-chip">q</span>
+            <span class="param-chip">page</span>
+            <span class="param-chip">limit</span>
+            <span class="param-chip">purity</span>
+            <span class="param-chip">sort</span>
+            <span class="param-chip">atleast</span>
+            <span class="param-chip">format=urls</span>
+          </div>
+        </div>
+        <div class="endpoint-example">
+          <div class="endpoint-example-header">
+            <span class="endpoint-example-label">Example request</span>
+            <button class="copy-btn" data-copy="https://zade-wallpaper-api.vercel.app/api/wallhaven?q=anime%20sunset&limit=5&purity=100">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <code>curl <span class="string">"https://zade-wallpaper-api.vercel.app/api/wallhaven?q=anime%20sunset&limit=5&purity=100"</span></code>
+        </div>
+      </article>
+
+      <!-- /api/wallpaperaccess -->
+      <article class="endpoint-card fade-up">
+        <div class="endpoint-header">
+          <div class="endpoint-title-group">
+            <span class="endpoint-method">GET</span>
+            <span class="endpoint-path">/api/wallpaperaccess</span>
+            <span class="endpoint-source-tag">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              direct
+            </span>
+          </div>
+        </div>
+        <p class="endpoint-description">
+          Direct image download by numeric ID. Search is gated by Cloudflare, but CDN serves full-res JPG/PNG directly. Best for batch downloads with known IDs.
+        </p>
+        <div class="endpoint-params">
+          <div class="endpoint-params-title">Parameters</div>
+          <div class="params-list">
+            <span class="param-chip">id <span style="color:var(--accent-magenta)">*</span></span>
+          </div>
+        </div>
+        <div class="endpoint-example">
+          <div class="endpoint-example-header">
+            <span class="endpoint-example-label">Example request</span>
+            <button class="copy-btn" data-copy="https://zade-wallpaper-api.vercel.app/api/wallpaperaccess?id=12578">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <code>curl <span class="string">"https://zade-wallpaper-api.vercel.app/api/wallpaperaccess?id=12578"</span> <span class="comment">-o wallpaper.jpg</span></code>
+        </div>
+      </article>
+
+      <!-- /api/workshop -->
+      <article class="endpoint-card fade-up">
+        <div class="endpoint-header">
+          <div class="endpoint-title-group">
+            <span class="endpoint-method">GET</span>
+            <span class="endpoint-path">/api/workshop</span>
+            <span class="endpoint-source-tag">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              steam
+            </span>
+          </div>
+        </div>
+        <p class="endpoint-description">
+          Browse Steam Workshop wallpapers for Wallpaper Engine (appid 431960). Returns titles, authors, preview URLs, and Steam page links. Binary wallpapers require subscription.
+        </p>
+        <div class="endpoint-params">
+          <div class="endpoint-params-title">Parameters</div>
+          <div class="params-list">
+            <span class="param-chip">q</span>
+            <span class="param-chip">sort</span>
+            <span class="param-chip">page</span>
+            <span class="param-chip">limit</span>
+          </div>
+        </div>
+        <div class="endpoint-example">
+          <div class="endpoint-example-header">
+            <span class="endpoint-example-label">Example request</span>
+            <button class="copy-btn" data-copy="https://zade-wallpaper-api.vercel.app/api/workshop?sort=trend&limit=10">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <code>curl <span class="string">"https://zade-wallpaper-api.vercel.app/api/workshop?sort=trend&limit=10"</span></code>
+        </div>
+      </article>
+
+      <!-- /api/dl -->
+      <article class="endpoint-card fade-up">
+        <div class="endpoint-header">
+          <div class="endpoint-title-group">
+            <span class="endpoint-method">GET</span>
+            <span class="endpoint-path">/api/dl</span>
+            <span class="endpoint-source-tag">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path></svg>
+              proxy
+            </span>
+          </div>
+        </div>
+        <p class="endpoint-description">
+          Unified image downloader. Pass <code class="mono">source</code> + <code class="mono">id</code> to auto-detect PNG/JPG/WebP, or pass a raw <code class="mono">url</code> for passthrough. Adds proper Referer headers and handles 404 fallbacks.
+        </p>
+        <div class="endpoint-params">
+          <div class="endpoint-params-title">Parameters</div>
+          <div class="params-list">
+            <span class="param-chip">source <span style="color:var(--accent-magenta)">*</span></span>
+            <span class="param-chip">id</span>
+            <span class="param-chip">url</span>
+          </div>
+        </div>
+        <div class="endpoint-example">
+          <div class="endpoint-example-header">
+            <span class="endpoint-example-label">Example request</span>
+            <button class="copy-btn" data-copy="https://zade-wallpaper-api.vercel.app/api/dl?source=wallhaven&id=j37zv5">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <code>curl <span class="string">"https://zade-wallpaper-api.vercel.app/api/dl?source=wallhaven&id=j37zv5"</span> <span class="comment">-o image.png</span></code>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PLAYGROUND
+     ============================================================ -->
+<section id="playground" class="playground">
+  <div class="container">
+    <div class="section-label fade-up">Interactive</div>
+    <h2 class="section-title fade-up">Try it right now.</h2>
+    <p class="section-subtitle fade-up">
+      No signup. Just pick a source, type a query, hit run.
+    </p>
+
+    <div class="playground-box fade-up">
+      <div class="playground-controls">
+        <div class="control-group">
+          <label class="control-label" for="pg-source">Source</label>
+          <select id="pg-source" class="control-select">
+            <option value="wallhaven">Wallhaven</option>
+            <option value="workshop">Steam Workshop</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="pg-query">Query</label>
+          <input id="pg-query" class="control-input" type="text" value="anime sunset" placeholder="search term..." />
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="pg-limit">Limit</label>
+          <select id="pg-limit" class="control-select">
+            <option>4</option>
+            <option selected>8</option>
+            <option>12</option>
+            <option>16</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <button id="pg-run" class="btn-run">
+            <span style="display:inline-flex;align-items:center;gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              Run query
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div id="pg-results" class="playground-results"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURES
+     ============================================================ -->
+<section id="features">
+  <div class="container">
+    <div class="section-label fade-up">Why this API</div>
+    <h2 class="section-title fade-up">Built for speed.<br/>Built to last.</h2>
+
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+        </div>
+        <h3 class="feature-title">Zero auth</h3>
+        <p class="feature-desc">No API keys, no tokens, no signup. Hit the URL, get the data. Public endpoints, public forever.</p>
+      </div>
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+        </div>
+        <h3 class="feature-title">Serverless edge</h3>
+        <p class="feature-desc">Deployed on Vercel edge functions. Cold start under 200ms, hot responses in &lt;50ms globally.</p>
+      </div>
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+        <h3 class="feature-title">3 sources, 1 API</h3>
+        <p class="feature-desc">Wallhaven search, Steam Workshop browse, WallpaperAccess direct DL — unified under consistent JSON.</p>
+      </div>
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        </div>
+        <h3 class="feature-title">Anti-bot bypassed</h3>
+        <p class="feature-desc">Minimal TLS fingerprint, smart referer headers, multi-extension fallbacks. Works where others 404.</p>
+      </div>
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+        <h3 class="feature-title">Auto PNG/JPG detect</h3>
+        <p class="feature-desc">Don't guess file extensions. The /api/dl proxy tries all formats and serves the right one.</p>
+      </div>
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        </div>
+        <h3 class="feature-title">Clean JSON</h3>
+        <p class="feature-desc">Deduplicated, normalized, consistent. Includes owner branding, total_records, cached flags.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+  <div class="container">
+    <p class="footer-brand">
+      <span style="background:var(--accent-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;">zade-wallpaper-api</span>
+      &middot; v1.0.0 &middot; built by Zora AI by Zade
+    </p>
+    <p class="footer-credit">
+      &copy; 2026 &middot; <a href="https://github.com/zedxlab/zade-wallpaper-api">GitHub</a> &middot; <a href="/api">JSON API</a> &middot; owner: <a href="https://t.me/zade4everbot">@zade4everbot</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   GSAP + INTERACTIVITY
+   ============================================================ */
+const API_BASE = 'https://zade-wallpaper-api.vercel.app';
+
+gsap.registerPlugin(ScrollTrigger);
+
+/* ----- Hero entrance ----- */
+window.addEventListener('load', () => {
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+  tl.to('.hero-badge', { opacity: 1, y: 0, duration: 0.8 }, 0)
+    .to('.hero-title', { opacity: 1, y: 0, duration: 1, ease: 'expo.out' }, 0.1)
+    .to('.hero-subtitle', { opacity: 1, y: 0, duration: 0.8 }, 0.3)
+    .to('.hero-cta-group', { opacity: 1, y: 0, duration: 0.8 }, 0.5)
+    .to('.hero-stats', { opacity: 1, y: 0, duration: 0.8 }, 0.7);
+
+  // Orb float
+  gsap.to('.hero-orb-1', { y: 50, duration: 8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+  gsap.to('.hero-orb-2', { y: -40, duration: 10, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+  gsap.to('.hero-orb-3', { y: 30, duration: 12, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+
+  // Scroll reveals
+  gsap.utils.toArray('.fade-up:not(.hero-badge):not(.hero-title):not(.hero-subtitle):not(.hero-cta-group):not(.hero-stats)').forEach(el => {
+    gsap.to(el, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 85%' }
+    });
+  });
+
+  // Counter animation
+  gsap.utils.toArray('[data-counter]').forEach(el => {
+    const target = parseInt(el.dataset.counter, 10);
+    const suffix = el.dataset.suffix || '';
+    const obj = { val: 0 };
+    gsap.to(obj, {
+      val: target,
+      duration: 1.5,
+      ease: 'power2.out',
+      delay: 1,
+      onUpdate: () => { el.textContent = Math.round(obj.val) + suffix; }
+    });
+  });
+
+  // Load preview grid
+  loadPreviewGrid();
+});
+
+/* ----- Preview grid (live wallpapers) ----- */
+async function loadPreviewGrid() {
+  const grid = document.getElementById('previewGrid');
+  const queries = [
+    { q: 'anime', source: 'wallhaven' },
+    { q: 'cyberpunk', source: 'wallhaven' },
+    { q: 'nature', source: 'wallhaven' },
+    { q: 'space', source: 'wallhaven' },
+    { q: 'mountain', source: 'wallhaven' },
+    { q: 'city', source: 'wallhaven' }
+  ];
+
+  for (const { q, source } of queries) {
+    try {
+      const res = await fetch(`${API_BASE}/api/${source}?q=${encodeURIComponent(q)}&limit=1&purity=100`);
+      const data = await res.json();
+      const item = data.results?.[0];
+      if (!item) continue;
+
+      const card = document.createElement('a');
+      card.href = item.full_url || item.preview || '#';
+      card.target = '_blank';
+      card.rel = 'noopener';
+      card.className = 'preview-card';
+      card.innerHTML = `
+        <img src="${item.thumb || item.preview}" alt="${q} wallpaper" loading="lazy" />
+        <div class="preview-card-overlay">
+          <div class="preview-card-source">${source}</div>
+          <div class="preview-card-id">${item.id || ''}</div>
+        </div>
+      `;
+
+      // 3D tilt
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        gsap.to(card, { rotationY: x * 8, rotationX: -y * 8, transformPerspective: 1000, duration: 0.4, ease: 'power2.out' });
+      });
+      card.addEventListener('mouseleave', () => {
+        gsap.to(card, { rotationY: 0, rotationX: 0, duration: 0.6, ease: 'power2.out' });
+      });
+
+      grid.appendChild(card);
+    } catch (err) {
+      console.error('Preview load failed:', err);
+    }
+  }
+}
+
+/* ----- Playground ----- */
+const pgSource = document.getElementById('pg-source');
+const pgQuery = document.getElementById('pg-query');
+const pgLimit = document.getElementById('pg-limit');
+const pgRun = document.getElementById('pg-run');
+const pgResults = document.getElementById('pg-results');
+
+pgSource.addEventListener('change', () => {
+  pgQuery.placeholder = pgSource.value === 'workshop' ? 'text filter (optional)...' : 'search term...';
+});
+
+pgRun.addEventListener('click', runPlayground);
+pgQuery.addEventListener('keydown', (e) => { if (e.key === 'Enter') runPlayground(); });
+
+async function runPlayground() {
+  const source = pgSource.value;
+  const query = pgQuery.value.trim();
+  const limit = pgLimit.value;
+
+  pgRun.disabled = true;
+  pgResults.innerHTML = '<div class="playground-loading">Searching ' + source + '...</div>';
+
+  try {
+    const params = new URLSearchParams({ limit });
+    if (query) params.set(source === 'wallhaven' ? 'q' : 'q', query);
+    if (source === 'wallhaven') params.set('purity', '100');
+
+    const res = await fetch(`${API_BASE}/api/${source}?${params}`);
+    const data = await res.json();
+
+    pgResults.innerHTML = '';
+
+    if (!data.results || data.results.length === 0) {
+      pgResults.innerHTML = '<div class="playground-loading">No results found.</div>';
+      return;
+    }
+
+    data.results.forEach((item, i) => {
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      const imgUrl = item.thumb || item.preview || '';
+      const dlUrl = item.full_url || item.page_url || '#';
+      const id = item.id || item.file_id || '';
+
+      card.innerHTML = `
+        <img src="${imgUrl}" alt="${id}" loading="lazy" />
+        <div class="result-card-overlay">
+          <div class="result-card-id">${id}</div>
+          <a class="result-card-link" href="${dlUrl}" target="_blank" rel="noopener">Open →</a>
+        </div>
+      `;
+      pgResults.appendChild(card);
+
+      gsap.to(card, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        delay: i * 0.05,
+        ease: 'power2.out'
+      });
+    });
+  } catch (err) {
+    pgResults.innerHTML = '<div class="playground-loading" style="color:var(--error)">Failed to fetch: ' + err.message + '</div>';
+  } finally {
+    pgRun.disabled = false;
+  }
+}
+
+// Auto-run on load
+setTimeout(runPlayground, 1500);
+
+/* ----- Copy buttons ----- */
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const text = btn.dataset.copy;
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.classList.add('copied');
+      btn.querySelector('span').textContent = 'Copied!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.querySelector('span').textContent = 'Copy';
+      }, 2000);
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  });
+});
+
+/* ----- Smooth scroll for nav anchors ----- */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    const id = a.getAttribute('href').slice(1);
+    const target = document.getElementById(id);
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>
